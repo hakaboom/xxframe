@@ -5,7 +5,7 @@ _metatable.__add=function (t1,t2)
 	local x,y,newPoint
 		x=p1.x+p2.x
 		y=p1.y+p2.y
-		newPoint=point:new({Cur={x=x,y=y}},true)
+		newPoint=point:newByCur({x=x,y=y})
 	return newPoint
 end
 _metatable.__sub=function (t1,t2)
@@ -13,7 +13,7 @@ _metatable.__sub=function (t1,t2)
 	local x,y,newPoint
 		x=p1.x-p2.x
 		y=p1.y-p2.y
-		newPoint=point:new({Cur={x=x,y=y}},true)
+		newPoint=point:newByCur({x=x,y=y})
 	return newPoint
 end
 _metatable.__eq=function (t1,t2)
@@ -81,6 +81,33 @@ function point:newByCur(Base)
 	}
 	o.Arry=Base.Arry or _const.Arry;Arry=o.Arry
 	if Base.color then o.Cur.color=Color3B(Base.color) end
+	setmetatable(o,{__index=self,
+		__add=_metatable.__add,
+		__sub=_metatable.__sub,
+		__eq=_metatable.__eq,
+	})	
+	return o
+end
+function point:newBymulti(Base)
+	local o={
+		_type="point",
+		offset=Base.offset,
+		fuzz=Base.fuzz or 95,
+		index=Base.index or 1,
+		Anchor=Base.Anchor,
+		MainPoint=Base.MainPoint,
+		DstMainPoint=Base.DstMainPoint,
+		Dev={
+			x=Base.x,
+			y=Base.y,
+			color=Base.color,
+		},
+		Cur={
+			x=Base.Cur.x,
+			y=Base.Cur.y,
+		},
+	}
+	if Base.color then o.Dev.color=Color3B(Base.color) end
 	setmetatable(o,{__index=self,
 		__add=_metatable.__add,
 		__sub=_metatable.__sub,
@@ -228,27 +255,26 @@ function multiPoint:new(Base)
 	if o.DstMainPoint then	
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
 			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,Arry)
-			o[k]=point:new(v,true)	--缩放
+			o[k]=point:newBymulti(v)	--缩放
 		end)
 	elseif not o.Anchor then 
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
 			v.Cur.x=(v.x-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
 			v.Cur.y=(v.y-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
 			v.MainPoint=o.MainPoint
-			o[k]=point:new(v,true)
+			o[k]=point:newBymulti(v)
 		end)
 	else	
 		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)	--计算锚点
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
 			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,Arry)
-			o[k]=point:new(v,true)--缩放
+			o[k]=point:newBymulti(v)
 		end)
 	end
 	if o.index then o.index=getScaleArea(o.index,o.DstMainPoint,o.MainPoint,Arry) end--如果有设置点击点
 	if o.Area then o.Area=getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,Arry) end	--缩放范围
 	
 	setmetatable(o,{__index = self})
-	
 	return o
 end
 function multiPoint:newBypoint(Base)
@@ -297,7 +323,7 @@ _K:keep(true)
 		self[k]:getBilinear()
 	end
 end
-function multiPoint:cmpColor()--比色
+function multiPoint:cmpColor()--比色 可以在这里取消注释进行测试时候的判断
 local floor=math.floor
 local abs=math.abs
   for k,v in ipairs(self) do
@@ -332,8 +358,7 @@ end
 function multiPoint:findColor(returnType)--区域找色
 assert(self.Area, "findColor没有传入Area")
 local color={}
-	table.foreachi(self,function (k,v) 
-		color[k]={
+	table.foreachi(self,function (k,v) color[k]={
 			pos=self[k]:getXYtoPoint(),
 			color=Color3B(v.Dev.color),
 			fuzz=v.fuzz,
@@ -353,8 +378,7 @@ end
 function multiPoint:findColors(returnType)	--区域多点找色
 assert(self.Area, "findColors没有传入Area")
 local color,postbl={},{}
-	table.foreachi(self,function (k,v) 
-		color[k]={
+	table.foreachi(self,function (k,v) color[k]={
 			pos=self[k]:getXYtoPoint(),
 			color=Color3B(v.Dev.color),
 			fuzz=v.fuzz,
@@ -376,9 +400,9 @@ local color,postbl={},{}
 		end
 	return false
 end
-function multiPoint:findColorEX(Ac)--瞎写的,用多点找色返回的点去取比色,Ac设置number,会调用new时的Ac个点给找色
+function multiPoint:findColorEX(Ac,fuzz)--瞎写的,用多点找色返回的点去取比色,Ac设置number,会调用new时的Ac个点给找色
 assert(self.Area, "findColors没有传入Area")
-Ac=Ac or 2
+Ac=Ac or 1
 local color,returnTbl={},{}
 	for i=1,Ac do v=self[i]
 		color[i]={
@@ -388,18 +412,20 @@ local color,returnTbl={},{}
 			offset=v.DiffColor or nil
 		}
 	end 
-	local initpoint=screen.findColors(self.Area,color,self.fuzz,self.priority,999)
+	local MainPoint={x=self[1].Dev.x,y=self[1].Dev.y}
+	local initpoint=screen.findColors(self.Area,color,(fuzz or self.fuzz),self.priority,999)
 --	print(#initpoint)
 		if #initpoint > 0 then
 			local Allpoint=self:getAllpoint()
-			for k,v in ipairs(initpoint) do
-				local Dst={x=initpoint[k].x,y=initpoint[k].y}
-				table.foreachi(Allpoint,function(k,v) v.DstMainPoint=Dst v.fuzz=95 v:refresh() end)
-				--table.foreachi(Allpoint,function(k,v) v:printXY() end)
-				if multiPoint:newBypoint(Allpoint):getandCmpColor() then
-					returnTbl[#returnTbl+1]=v
+				for k,v in ipairs(initpoint) do
+					local Dst={x=initpoint[k].x,y=initpoint[k].y}
+					table.foreachi(Allpoint,function(k,v)v.MainPoint=MainPoint v.DstMainPoint=Dst v:refresh() end)
+					local multipoint=multiPoint:newBypoint(Allpoint)
+						multipoint:getColor()
+						if multipoint:cmpColor() then
+							returnTbl[#returnTbl+1]=v
+						end
 				end
-			end
 			return returnTbl
 		end
 end
@@ -813,7 +839,7 @@ function System:new(DevScreen,CurScreen,initfor,MainPointsScaleMode,AppurtenantS
 	end
 	
 	setmetatable(o,{__index=self} )
-	_const.Arry=o.Arry
+	if _const.Arry==nil then _const.Arry=o.Arry end
 	return o
 end
 function System:keep(boole,T)--和scren.keep()一样

@@ -63,3 +63,24 @@ test_Click=multiPoint:new({
 })
 test_Click:Click()--点击index范围内的坐标
 test_Click:AllClick()--点击所有参数点除锚点和index
+
+
+--这边演示一个方法,在框架内会默认设置属性Arry,Arry中会保存缩放的属性
+--因此如果在脚本内需要动态的进行缩放,或者不同分辨率的取色,只需要在多点对象中传入Arry即可
+local DevScreen={	--开发分辨率
+	Top=0,Bottom=0,Left=0,Right=0,
+	Width=1280,Height=720,
+}
+local CurScreen={	--本机分辨率
+	Top=0,Bottom=0,Left=0,Right=0,
+	Width=1920,Height=1080,
+}
+_720_to_1080=System:new(DevScreen,CurScreen,1,"Height","Height"):getArry()
+test_Arry=multiPoint:new({	
+	{x=66.67,y=133.33,color=0xffffff},
+	{x=100,y=133.33,color=0xffffff},
+	{x=66.67,y=166.67,color=0xffffff},
+	_tag="测试不同分辨率缩放",
+	Arry=_720_to_1080,
+})
+test_Arry:printXY()
