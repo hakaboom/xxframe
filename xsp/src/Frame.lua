@@ -107,6 +107,7 @@ function point:newBymulti(Base)
 			y=Base.Cur.y,
 		},
 	}
+	o.Arry=Base.Arry or _const.Arry;Arry=o.Arry
 	if Base.color then o.Dev.color=Color3B(Base.color) end
 	setmetatable(o,{__index=self,
 		__add=_metatable.__add,

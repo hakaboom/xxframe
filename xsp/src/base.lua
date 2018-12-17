@@ -34,19 +34,6 @@ function belongindex(aimTable,aim)--判断目标变量在表中是否存在
 	return false
 end
 
-function getKeysSortedByValue(tbl, sortFunction)--表按照value排序
-  local keys = {}
-  for key in pairs(tbl) do
-    table.insert(keys, key)
-  end
-
-  table.sort(keys, function(a, b)
-    return sortFunction(tbl[a], tbl[b])
-  end)
-
-  return keys
-end
-
 function getTableFromString(str,aim) --从字符串中查找符合aim的条件,以表返回
 	local insert=table.insert
 	local aimTable={}
