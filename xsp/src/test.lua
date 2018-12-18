@@ -1,11 +1,11 @@
+--处理多点找色返回值test
 abs=math.abs
 local new = {}
 for i = 1, #Table do
 	new[i] = {}
 	for k = 1, #Table do
 		if k ~= i then
-			--local distance = math.sqrt((Table[k][1]-Table[i][1])^2+(Table[k][2]-Table[i][2])^2)
-			if abs(Table[k].x-Table[i].x)<=n and abs(Table[k].y-Table[i].y)<=n then --if distance<=20 then
+			if abs(Table[k].x-Table[i].x)<=n and abs(Table[k].y-Table[i].y)<=n then
 				new[i][#new[i]+1] = k
 			end
 		end

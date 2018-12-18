@@ -45,7 +45,8 @@ function point:new(Base)--Base={x=100,y=100,color=0xFFFFFF,fuzz=95}
 		Cur={
 		},
 	}
-	o.Arry=Base.Arry or _const.Arry;Arry=o.Arry
+	o.Arry=Base.Arry or _const.Arry;
+	local Arry=o.Arry
 	if Base.color then o.Dev.color=Color3B(Base.color) end
 	---------------------------------------------------
 	if o.DstMainPoint then
@@ -79,7 +80,7 @@ function point:newByCur(Base)
 			y=Base.y,	--y(必填)
 		},
 	}
-	o.Arry=Base.Arry or _const.Arry;Arry=o.Arry
+	o.Arry=Base.Arry or _const.Arry
 	if Base.color then o.Cur.color=Color3B(Base.color) end
 	setmetatable(o,{__index=self,
 		__add=_metatable.__add,
@@ -107,7 +108,7 @@ function point:newBymulti(Base)
 			y=Base.Cur.y,
 		},
 	}
-	o.Arry=Base.Arry or _const.Arry;Arry=o.Arry
+	o.Arry=Base.Arry or _const.Arry;
 	if Base.color then o.Dev.color=Color3B(Base.color) end
 	setmetatable(o,{__index=self,
 		__add=_metatable.__add,
@@ -164,8 +165,8 @@ local abs=math.abs
 	local fuzz = floor(0xff * (100 - self.fuzz) * 0.01)
 	local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
 	local r,g,b=self.Dev.color.r,self.Dev.color.g,self.Dev.color.b
-	local r3,g3,b3=abs(lr-r),abs(lg-g),abs(lb-b)
-	local diff=math.sqrt(r3*r3+g3*g3+b3*b3)
+	local r3,g3,b3=(lr-r),(lg-g),(lb-b)
+	local diff=math.sqrt(r3^2+g3^2+b3^2)
 		if diff>fuzz then
 			return false
 		end
@@ -251,7 +252,8 @@ function multiPoint:new(Base)
 		limit=Base.limit,--(多点找色的返回值数量)
 		priority=Base.priority or screen.PRIORITY_DEFAULT,--(找色扫描方向)
 	}
-	o.Arry=Base.Arry or _const.Arry;Arry=o.Arry
+	o.Arry=Base.Arry or _const.Arry
+	local Arry=o.Arry
 	------------------------------------------------------------------------------
 	if o.DstMainPoint then	
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
@@ -268,12 +270,12 @@ function multiPoint:new(Base)
 	else	
 		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)	--计算锚点
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
-			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,Arry)
+			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,o.Arry)
 			o[k]=point:newBymulti(v)
 		end)
 	end
-	if o.index then o.index=getScaleArea(o.index,o.DstMainPoint,o.MainPoint,Arry) end--如果有设置点击点
-	if o.Area then o.Area=getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,Arry) end	--缩放范围
+	if o.index then o.index=getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) end--如果有设置点击点
+	if o.Area then o.Area=getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) end	--缩放范围
 	
 	setmetatable(o,{__index = self})
 	return o
@@ -291,7 +293,7 @@ function multiPoint:newBypoint(Base)
 		offset=Base.offset,--偏色值(用于二值化 选填)
 		priority=Base.priority or screen.PRIORITY_DEFAULT,
 	}
-	o.Arry=Base.Arry or _const.Arry;Arry=o.Arry
+	o.Arry=Base.Arry or _const.Arry
 	------------------------------------------------------------------------------
 	table.foreachi(Base,function(k,v) o[k]=v end)
 	setmetatable(o,{__index=self})
@@ -326,13 +328,12 @@ _K:keep(true)
 end
 function multiPoint:cmpColor()--比色 可以在这里取消注释进行测试时候的判断
 local floor=math.floor
-local abs=math.abs
   for k,v in ipairs(self) do
 	local fuzz = floor(0xff * (100 - v.fuzz) * 0.01)
 	local lr,lg,lb=v.Cur.color.r,v.Cur.color.g,v.Cur.color.b
 	local r,g,b=v.Dev.color.r,v.Dev.color.g,v.Dev.color.b
-	local r3,g3,b3=abs(lr-r),abs(lg-g),abs(lb-b)
-	local diff=math.sqrt(r3*r3+g3*g3+b3*b3)
+	local r3,g3,b3=(lr-r),(lg-g),(lb-b) --abs(lr-r),abs(lg-g),abs(lb-b)
+	local diff=math.sqrt(r3^2+g3^2+b3^2)	--r3*r3+g3*g3+b3*b3	
 		if diff>fuzz then
 			--printf(">>>>>>>>>>>>>>>>>>>>>>>错误位置:%s",(self._tag or ""))
 			--printf("错误点[%s]:x=%s,y=%s",k,v.Cur.x,v.Cur.y)

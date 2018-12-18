@@ -1,14 +1,14 @@
 --[[data={
 	{x=100,y=200,color=0xffffff},
 	{x=150,y=200,color=0xffffff},
-	{x=100,y=250,color=0xffffff},
+	{x=100,y=250,color=0xffffff,fuzz=90,offset=0x010101},	--单点对象也是这个格式
 	fuzz=90,								--模糊值
 	offset=0x010101,						--偏色
 	index={},								--点击坐标{x1,y1,x2,y2}
 	MainPoint={},							--锚点{x=x1,y=y1}
 	Anchor=,								--锚点类型(具体见const)
 	Area={},								--范围{x1,y1,x2,y2}
-	_tag="测试",								--用于标记用于print等打印
+	_tag="测试",							--用于标记用于print等打印
 }
 ]]--
 --point类的使用方法和multiPoint差不多,实际上multiPoint中的点都是用point创建的,所以都能单独的去访问
