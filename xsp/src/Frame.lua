@@ -1,6 +1,10 @@
-_metatable={
+
+point={--单点对象
 }
-_metatable.__add=function (t1,t2)
+_point_metatable={
+}
+_point_metatable.__index=point
+_point_metatable.__add=function (t1,t2)
 	local p1,p2=t1.Cur,t2.Cur
 	local x,y,newPoint
 		x=p1.x+p2.x
@@ -8,7 +12,7 @@ _metatable.__add=function (t1,t2)
 		newPoint=point:newByCur({x=x,y=y})
 	return newPoint
 end
-_metatable.__sub=function (t1,t2)
+_point_metatable.__sub=function (t1,t2)
 	local p1,p2=t1.Cur,t2.Cur
 	local x,y,newPoint
 		x=p1.x-p2.x
@@ -16,7 +20,7 @@ _metatable.__sub=function (t1,t2)
 		newPoint=point:newByCur({x=x,y=y})
 	return newPoint
 end
-_metatable.__eq=function (t1,t2)
+_point_metatable.__eq=function (t1,t2)
 	local p1,p2=t1.Cur,t2.Cur
 	local x,y
 	if p1.x==p2.x and p1.y==p1.y then
@@ -24,10 +28,11 @@ _metatable.__eq=function (t1,t2)
 	end
 	return false
 end
-
-
-point={--单点对象
-}
+_point_metatable.__tostring=function (p)
+	return string.format("point<Dev=[x=%.0f,y=%.0f] Cur=[x=%.2f,y=%.2f]>",
+				p.Dev.x,p.Dev.y,p.Cur.x,p.Cur.y
+	) 
+end
 function point:new(Base)--Base={x=100,y=100,color=0xFFFFFF,fuzz=95}
 	local o={
 		_type="point",
@@ -40,14 +45,13 @@ function point:new(Base)--Base={x=100,y=100,color=0xFFFFFF,fuzz=95}
 		Dev={
 			x=Base.x,	--x(必填)
 			y=Base.y,	--y(必填)
-			color=nil,--颜色值(选填)
+			color=(Base.color and Color3B(Base.color) or nil),--颜色值(选填)
 		},
 		Cur={
 		},
 	}
 	o.Arry=Base.Arry or _const.Arry;
 	local Arry=o.Arry
-	if Base.color then o.Dev.color=Color3B(Base.color) end
 	---------------------------------------------------
 	if o.DstMainPoint then
 		o.Cur.x,o.Cur.y=getScaleXY(o.Dev,o.MainPoint,o.DstMainPoint,Arry)
@@ -55,15 +59,10 @@ function point:new(Base)--Base={x=100,y=100,color=0xFFFFFF,fuzz=95}
 		o.Cur.x=(o.Dev.x-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
 		o.Cur.y=(o.Dev.y-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
 	else	
-		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)	--计算锚点
+		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)
 		o.Cur.x,o.Cur.y=getScaleXY(o.Dev,o.MainPoint,o.DstMainPoint,Arry)
 	end
-
-	setmetatable(o,{__index=self,
-		__add=_metatable.__add,
-		__sub=_metatable.__sub,
-		__eq=_metatable.__eq,
-	})	
+	setmetatable(o,_point_metatable)	
 	return o
 end
 function point:newByCur(Base)
@@ -78,15 +77,11 @@ function point:newByCur(Base)
 		Cur={
 			x=Base.x,	--x(必填)
 			y=Base.y,	--y(必填)
+			color=(Base.color and Color3B(Base.color) or nil),
 		},
 	}
 	o.Arry=Base.Arry or _const.Arry
-	if Base.color then o.Cur.color=Color3B(Base.color) end
-	setmetatable(o,{__index=self,
-		__add=_metatable.__add,
-		__sub=_metatable.__sub,
-		__eq=_metatable.__eq,
-	})	
+	setmetatable(o,_point_metatable)	
 	return o
 end
 function point:newBymulti(Base)
@@ -101,7 +96,7 @@ function point:newBymulti(Base)
 		Dev={
 			x=Base.x,
 			y=Base.y,
-			color=Base.color,
+			color=(Base.color and Color3B(Base.color) or nil),
 		},
 		Cur={
 			x=Base.Cur.x,
@@ -109,12 +104,7 @@ function point:newBymulti(Base)
 		},
 	}
 	o.Arry=Base.Arry or _const.Arry;
-	if Base.color then o.Dev.color=Color3B(Base.color) end
-	setmetatable(o,{__index=self,
-		__add=_metatable.__add,
-		__sub=_metatable.__sub,
-		__eq=_metatable.__eq,
-	})	
+	setmetatable(o,_point_metatable)	
 	return o
 end
 function point:touchHold(T)--按住屏幕,单位/秒
@@ -274,8 +264,10 @@ function multiPoint:new(Base)
 			o[k]=point:newBymulti(v)
 		end)
 	end
-	if o.index then o.index=getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) end--如果有设置点击点
-	if o.Area then o.Area=getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) end	--缩放范围
+	o.index=(o.index and getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
+	o.Area=(o.Area and getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
+	--if o.index then o.index=getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) end--如果有设置点击点
+	--if o.Area then o.Area=getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) end	--缩放范围
 	
 	setmetatable(o,{__index = self})
 	return o
@@ -370,7 +362,7 @@ local color={}
 	local pos=screen.findColor(self.Area,color,self.fuzz,self.priority)
 		if pos ~= Point.INVALID then
 			if returnType=="getXY" then
-				return point:newByCur({x=pos.x,y=pos.y}):getXY()
+				return {x=pos.x,y=pos.y}
 			else
 				return point:newByCur({x=pos.x,y=pos.y})
 			end
@@ -649,7 +641,7 @@ function OCR:getText(data)--{rect={},diff={},PSM=6,white="123456789"}
 			return s:match'^%s*(.*%S)'  or ''
 	end
 	if data.binarize then Data=data.binarize else --二值化图片
-		local img=Image.fromScreen(Rect(data.Rect))
+		local img=Image.fromScreen(data.Rect)
 		local Data=img:binarize(data.diff)	
 	end
 	local PSM=data.PSM or self.PSM

@@ -1,5 +1,9 @@
-if xmod.VERSION_CODE<20000 then print("请使用2.0") xmod.exit() end
--- v1.3.11
+if not rawget(_G, 'xmod') then
+	error("the fucking 'xmod' not find")
+end
+
+-- v1.3.12
+--  框架手册			 https://www.zybuluo.com/hakaboom/note/1370480
 --	叉叉2.0开发手册   https://www.zybuluo.com/xxzhushou/note/1271276
 --	lua 5.3手册	  	 https://cloudwu.github.io/lua53doc/contents.html
 --	github		   	 https://github.com/hakaboom/xxframe 
@@ -22,10 +26,10 @@ CurScreen={	--本机分辨率
 	Top=0,Bottom=0,Left=0,Right=0,
 	Width=1280,Height=720,
 }
-_K=System:new(DevScreen,CurScreen,1,"Height","Height")
+_K=System:new(CurScreen,CurScreen,1,"Height","Height")
 screen.init(1)
 --需要什么demo就取消哪个的注释
-require'Demo.multiPoint'
+--require'Demo.multiPoint'
 
 --require'Demo.File'
 
@@ -34,3 +38,4 @@ require'Demo.multiPoint'
 --require'Demo.runTime'
 
 --require'Demo.Slide'
+
