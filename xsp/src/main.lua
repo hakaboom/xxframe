@@ -38,4 +38,3 @@ screen.init(1)
 --require'Demo.runTime'
 
 --require'Demo.Slide'
-

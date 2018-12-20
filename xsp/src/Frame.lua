@@ -33,7 +33,7 @@ _point_metatable.__tostring=function (p)
 				p.Dev.x,p.Dev.y,p.Cur.x,p.Cur.y
 	) 
 end
-function point:new(Base)--Base={x=100,y=100,color=0xFFFFFF,fuzz=95}
+function point:new(Base)--创建单点对象
 	local o={
 		_type="point",
 		offset=Base.offset,	--偏色(选填)
@@ -194,7 +194,7 @@ function point:resetDev(x,y)--重设Dev坐标
 	self.Dev.x=x
 	self.Dev.y=y
 end
-function point:refresh()	--刷新
+function point:refresh()--刷新
 local o=self
 local Arry=o.Arry
 	if o.DstMainPoint then
@@ -228,7 +228,7 @@ end
 
 multiPoint={--多点对象
 }
-function multiPoint:new(Base)
+function multiPoint:new(Base)--创建多点对象
 	local o={
 		_type="multiPoint",
 		_tag=Base._tag,
@@ -272,7 +272,7 @@ function multiPoint:new(Base)
 	setmetatable(o,{__index = self})
 	return o
 end
-function multiPoint:newBypoint(Base)
+function multiPoint:newBypoint(Base)--由单点对象创建多点对象
 	local o={
 		_type="multiPoint",
 		_tag=Base._tag,
@@ -324,19 +324,20 @@ local floor=math.floor
 	local fuzz = floor(0xff * (100 - v.fuzz) * 0.01)
 	local lr,lg,lb=v.Cur.color.r,v.Cur.color.g,v.Cur.color.b
 	local r,g,b=v.Dev.color.r,v.Dev.color.g,v.Dev.color.b
-	local r3,g3,b3=(lr-r),(lg-g),(lb-b) --abs(lr-r),abs(lg-g),abs(lb-b)
-	local diff=math.sqrt(r3^2+g3^2+b3^2)	--r3*r3+g3*g3+b3*b3	
+	local r3,g3,b3=(lr-r),(lg-g),(lb-b)
+	local diff=math.sqrt(r3^2+g3^2+b3^2)
 		if diff>fuzz then
+			err=_printcmpColorErr_(v.Cur.color,v.Dev.color,diff,self._tag,k)
 			--printf(">>>>>>>>>>>>>>>>>>>>>>>错误位置:%s",(self._tag or ""))
 			--printf("错误点[%s]:x=%s,y=%s",k,v.Cur.x,v.Cur.y)
 			--printf("缩放后:r=%.0f,g=%.0f,b=%.0f",lr,lg,lb)
 			--printf("缩放前:r=%s,g=%s,b=%s",r,g,b)
 			--printf("Diff=%s,Degree=%s",diff,v.Degree)
-			--print(">>>>>>>>>>>>>>>>找色结果:fasle")
-			return false
+			--printf(">>>>>>>>>>>>>>>>%s:fasle",(self._tag or ""))
+			return false,err
 		end
   end
-	--printf(">>>>>>>>>>>>>>>>%s:true",(self._tag or ""))
+	printf(">>>>>>>>>>>>>>>>%s:true",(self._tag or ""))
   return true
 end
 function multiPoint:getandCmpColor(touchmode,T)
@@ -369,7 +370,7 @@ local color={}
 		end
 	return false
 end
-function multiPoint:findColors(returnType)	--区域多点找色
+function multiPoint:findColors(returnType)--区域多点找色
 assert(self.Area, "findColors没有传入Area")
 local color,postbl={},{}
 	table.foreachi(self,function (k,v) color[k]={
@@ -394,7 +395,7 @@ local color,postbl={},{}
 		end
 	return false
 end
-function multiPoint:findColorEX(Ac,fuzz)--瞎写的,用多点找色返回的点去取比色,Ac设置number,会调用new时的Ac个点给找色
+function multiPoint:findColorEX(Ac,fuzz)--用多点找色返回的点去取比色,Ac设置number,会调用new时的Ac个点给找色
 assert(self.Area, "findColors没有传入Area")
 Ac=Ac or 1
 local color,returnTbl={},{}
@@ -424,11 +425,13 @@ local color,returnTbl={},{}
 		end
 end
 function multiPoint:binarizeImage()--二值化图片
+assert(self.Area, "findColors没有传入Area")
 	local img = Image.fromScreen(self.Area)
 	local data = img:binarize(self.offset)
 	self.binarize=data
 end
 function multiPoint:getText(data)--识字
+assert(self.Area, "findColors没有传入Area")
 	if not self.binarize then self:binarizeImage() end
 	local ocr=OCR:new({lang="eng"})
 	data.binarize=self.binarize
@@ -471,7 +474,7 @@ end
 --没用2.0 用的旧得api
 HUD={
 }
-function HUD:new(Baseinfo)	--Baseinfo={point=multipoint:getXY(),color,text,bg,size}
+function HUD:new(Baseinfo)--创建HUD
 	local o={
 		origin=Baseinfo.point[1],
 		size=Size(Baseinfo.point[2]-Baseinfo.point[1]),
@@ -511,7 +514,7 @@ end
 
 runTime={--计时器
 }
-function runTime:new()
+function runTime:new()--创建计时器
 	local o={
 		startTime=os.milliTime()
 	}
@@ -849,6 +852,9 @@ end
 function System:setKeepTime(T)--设置截图前的延迟
 	self.KeepTime=T
 end
+function System:addSystemData(key , value)
+	self.SystemData[key] = value
+end
 function System:getSystemData()--一些系统的属性,按照需求自己添加
 local UserInfo,code = script.getUserInfo()
 local ScriptInfo, code = script.getScriptInfo()
@@ -870,3 +876,5 @@ end
 function System:getArry()--获取Arry缩放参数
 	return self.Arry
 end
+
+

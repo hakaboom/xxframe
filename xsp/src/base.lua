@@ -143,7 +143,7 @@ local Print_Space_str=" "
 			elseif type_t=="boolean" then
 				printf("%s[%s] = %s",string.rep("\t",SpaceNum),tostring(k),(v and "true" or "false"))
 			elseif type_t=="userdata" then
-				printf("%s%s",string.rep("\t",SpaceNum),v)
+				printf("%s[%s] = %s",string.rep("\t",SpaceNum),tostring(k),v)
 			else
 				print(str..k..':'..type_t)
 			end
