@@ -1,5 +1,6 @@
 function TableCopy(Tbl)--表复制没有复制元表
 	local t={}
+	if getmetatable(Tbl) then setmetatable(t,getmetatable(Tbl)) end
 	for k,v in pairs(Tbl) do
 		if type(v)=="table" then
 			t[k]=TableCopy(v)
@@ -77,6 +78,21 @@ function getTblLen(tbl)--获取表长度
 	return len
 end
 
+function split(str,pattern,content)--字符串分割
+	if str==nil or str=='' or pattern==nil then
+		return {}
+	end
+	local result = {}
+	if content=="single" then
+		str=str..pattern
+		pattern="(.-)"..pattern
+	end
+	for v in string.gmatch(str,pattern) do
+		result[#result+1]=v
+	end
+	return result
+end
+
 function urlencode(w)
 local pattern = "[^%w%d%?=&:/._%-%* ]"
     s = string.gsub(w, pattern, function(c)
@@ -120,51 +136,60 @@ function getScaleArea(Area,DstMainPoint,MainPoint,Arry)	--缩放Area
 end
 
 function Print(...)
-	local _print_Space_str=" "
-	local _print_Empty_String="empty_s"
-	local _print_Empty_Table="empty_t"
-	local SpaceNum=SpaceNum or 0
+	local SpaceNum=_GetSpaceNum()
+	local Num=0
 	local format=string.format
 	local arg={...}
 	local tbl={"\n"}
-	function printTable(t,SpaceNum)
+	local function _SpaceNumRep(Num)
+		if SpaceNum[Num] then
+			return SpaceNum[Num]
+		end
+		return Num == 0 and '' or string.rep('\t',Num)
+	end
+	function printTable(t,Num)
+	Num=Num+1
 	local tbl={}
 		for k,v in pairs(t) do
 			local _type=type(v)
-			if _type=="table" then
-				tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s}\n",string.rep("\t",SpaceNum),tostring(k),printTable(v,SpaceNum+1),string.rep("\t",SpaceNum))
+			if _type=="table" and k~="_G" and(not v.package) then
+				tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s}\n",_SpaceNumRep(Num),tostring(k),printTable(v,Num),_SpaceNumRep(Num))
+			elseif _type=="table" and (v.package) then
+				tbl[#tbl+1]=format("%s[%s](%s) = %s",_SpaceNumRep(Num),tostring(k),_type,v)
 			elseif _type=="number" then
-				tbl[#tbl+1]=format("%s[%s](num) = %s \n",string.rep("\t",SpaceNum),tostring(k),tonumber(v))
+				tbl[#tbl+1]=format("%s[%s](num) = %s \n",_SpaceNumRep(Num),tostring(k),v)
 			elseif _type=="string" then
-				tbl[#tbl+1]=format("%s[%s](str) = %s \n",string.rep("\t",SpaceNum),tostring(k),(v and v or  Print_Empty_String))
+				tbl[#tbl+1]=format("%s[%s](str) = %s \n",_SpaceNumRep(Num),tostring(k),(v=="" and "empty_s" or v))
 			elseif _type=="boolean" then
-				tbl[#tbl+1]=format("%s[%s](bool) = %s \n",string.rep("\t",SpaceNum),tostring(k),(v and "true" or "false"))
+				tbl[#tbl+1]=format("%s[%s](bool) = %s \n",_SpaceNumRep(Num),tostring(k),(v and "true" or "false"))
 			elseif _type=="userdata" then 
-				tbl[#tbl+1]=format("%s[%s](usr) = %s \n",string.rep("\t",SpaceNum),tostring(k),v)
+				tbl[#tbl+1]=format("%s[%s](usr) = %s \n",_SpaceNumRep(Num),tostring(k),v)
 			end
 		end
 		return table.concat(tbl)
 	end
+	
 	for i=1,#arg do
 		local t=arg[i]
 		local _type=type(t)
 			if _type=="table" then
-				tbl[#tbl+1]=format(" \n Table = { \n %s \n } \n",printTable(t,SpaceNum+1))
+				tbl[#tbl+1]=format(" \n Table = { \n %s \n } \n",printTable(t,Num))
 			elseif _type=="string" then
-				tbl[#tbl+1]=format("%s  \n",(t and t or Print_Empty_String))
+				tbl[#tbl+1]=format("%s, ",(t=="" and "empty_s"  or t))
 			elseif _type=="number" then
-				tbl[#tbl+1]=format("%s  \n",t)
+				tbl[#tbl+1]=format("%s, ",t)
 			elseif _type=="boolean" then
-				tbl[#tbl+1]=format("%s  \n",(t and "true" or "false"))
+				tbl[#tbl+1]=format("%s, ",(t and "true" or "false"))
 			elseif _type=="userdata" then
-				tbl[#tbl+1]=format("%s  \n",t)
+				tbl[#tbl+1]=format("%s, ",t)
 			elseif _type=="function" then
-				tbl[#tbl+1]=format("%s  \n",t)
+				tbl[#tbl+1]=format("%s, ",t)
 			elseif _type=="nil" then
-				tbl[#tbl+1]=format("%s  \n","nil")
+				tbl[#tbl+1]=format("%s, ","nil")
 			else
 			
 			end
 	end
-	print(table.concat(tbl))
+	
+print(table.concat(tbl))
 end

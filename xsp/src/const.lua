@@ -62,6 +62,23 @@ _const={
 	},
 }
 
-_printcmpColorErr_=function (Cur,Dev,diff,tag,key) tag=tag or ""  end
+_GetSpaceNum = function () 
+return
+	{
+		"\t",
+		"\t\t",
+		"\t\t\t",
+		"\t\t\t\t",
+		"\t\t\t\t\t",
+		"\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t\t\t\t\t",
+	}
+end
+
+_printcmpColorErr_=function (Cur,Dev,tag,key) tag=tag or "" return  end
 
 return _const

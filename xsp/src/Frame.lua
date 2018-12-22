@@ -30,13 +30,11 @@ _point_metatable.__eq=function (t1,t2)
 end
 _point_metatable.__tostring=function (p)
 	return string.format("point<Dev=[x=%.0f,y=%.0f] Cur=[x=%.2f,y=%.2f]>",
-				p.Dev.x,p.Dev.y,p.Cur.x,p.Cur.y
-	) 
+				p.Dev.x,p.Dev.y,p.Cur.x,p.Cur.y) 
 end
 function point:new(Base)--创建单点对象
 	local o={
 		_type="point",
-		offset=Base.offset,	--偏色(选填)
 		fuzz=Base.fuzz or 95,--模糊度(选填)
 		index=Base.index or 1,--点击的index(选填)
 		Anchor=Base.Anchor,--锚点(选填)
@@ -46,6 +44,7 @@ function point:new(Base)--创建单点对象
 			x=Base.x,	--x(必填)
 			y=Base.y,	--y(必填)
 			color=(Base.color and Color3B(Base.color) or nil),--颜色值(选填)
+			offset=(Base.offset and Color3B(Base.offset) or nil),
 		},
 		Cur={
 		},
@@ -68,7 +67,6 @@ end
 function point:newByCur(Base)
 	local o={
 		_type="point",
-		offset=Base.offset,	--偏色(选填)
 		fuzz=Base.fuzz or 95,--模糊度(选填)
 		index=Base.index or 1,--点击的index(选填)
 		Anchor=Base.Anchor,--锚点(选填)
@@ -78,6 +76,7 @@ function point:newByCur(Base)
 			x=Base.x,	--x(必填)
 			y=Base.y,	--y(必填)
 			color=(Base.color and Color3B(Base.color) or nil),
+			offset=(Base.offset and Color3B(Base.offset) or nil),
 		},
 	}
 	o.Arry=Base.Arry or _const.Arry
@@ -87,7 +86,6 @@ end
 function point:newBymulti(Base)
 	local o={
 		_type="point",
-		offset=Base.offset,
 		fuzz=Base.fuzz or 95,
 		index=Base.index or 1,
 		Anchor=Base.Anchor,
@@ -97,6 +95,7 @@ function point:newBymulti(Base)
 			x=Base.x,
 			y=Base.y,
 			color=(Base.color and Color3B(Base.color) or nil),
+			offset=(Base.offset and Color3B(Base.offset) or nil),
 		},
 		Cur={
 			x=Base.Cur.x,
@@ -152,18 +151,29 @@ end
 function point:cmpColor()--比色
 local floor=math.floor
 local abs=math.abs
-	local fuzz = floor(0xff * (100 - self.fuzz) * 0.01)
-	local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
-	local r,g,b=self.Dev.color.r,self.Dev.color.g,self.Dev.color.b
-	local r3,g3,b3=(lr-r),(lg-g),(lb-b)
-	local diff=math.sqrt(r3^2+g3^2+b3^2)
-		if diff>fuzz then
-			return false
+local r ,g ,b =self.Dev.color.r,self.Dev.color.g,self.Dev.color.b	
+local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
+	if self.Dev.offset then
+		local ofr,ofg,ofb=offColor.r,offColor.g,offColor.b	--偏色rgb
+		local ar,ag,ab=r-ofr,g-ofg,b-ofb	--max
+		local ir,ig,ib=r+ofr,g+ofg,b+ofb	--min
+--Print({["maxs"]={ar,ag,ab},["mins"]={ir,ig,ib},["Cur"]={lr,lg,lb}})
+		if ((ar<lr)and(ag<lg)and(ab<lb)) and  --max<color<min
+			((lr<ir)and(lg<ig)and(lb<ib)) then
+			return true
 		end
-	return true
+		return false
+	else
+		local fuzz = floor(0xff * (100 - self.fuzz) * 0.01)
+		local r3,g3,b3=(lr-r),(lg-g),(lb-b)
+		local diff=math.sqrt(r3^2+g3^2+b3^2)
+			if diff>fuzz then
+				return false
+			end
+		return true
+	end
 end
 function point:getandCmpColor(touchmode,T)
-	--self:getBilinear()
 	self[_const.GetColorMode](self)
 	local bool=self:cmpColor()
 	if touchmode==true then
@@ -321,19 +331,9 @@ end
 function multiPoint:cmpColor()--比色 可以在这里取消注释进行测试时候的判断
 local floor=math.floor
   for k,v in ipairs(self) do
-	local fuzz = floor(0xff * (100 - v.fuzz) * 0.01)
-	local lr,lg,lb=v.Cur.color.r,v.Cur.color.g,v.Cur.color.b
-	local r,g,b=v.Dev.color.r,v.Dev.color.g,v.Dev.color.b
-	local r3,g3,b3=(lr-r),(lg-g),(lb-b)
-	local diff=math.sqrt(r3^2+g3^2+b3^2)
-		if diff>fuzz then
-			err=_printcmpColorErr_(v.Cur.color,v.Dev.color,diff,self._tag,k)
-			--printf(">>>>>>>>>>>>>>>>>>>>>>>错误位置:%s",(self._tag or ""))
-			--printf("错误点[%s]:x=%s,y=%s",k,v.Cur.x,v.Cur.y)
-			--printf("缩放后:r=%.0f,g=%.0f,b=%.0f",lr,lg,lb)
-			--printf("缩放前:r=%s,g=%s,b=%s",r,g,b)
-			--printf("Diff=%s,Degree=%s",diff,v.Degree)
-			--printf(">>>>>>>>>>>>>>>>%s:fasle",(self._tag or ""))
+		local  res=v:cmpColor()
+		if not res then
+			local err=_printcmpColorErr_(v.Cur.color,v.Dev.color,self._tag,k)
 			return false,err
 		end
   end
@@ -342,13 +342,13 @@ local floor=math.floor
 end
 function multiPoint:getandCmpColor(touchmode,T)
 	self[_const.GetColorMode](self)
-	local bool=self:cmpColor()
+	local bool,err=self:cmpColor()
 	if touchmode==true then
 		if bool then self:Click(T) end
 	elseif touchmode==false then
 		if not bool then self:Click(T) end
 	end
-	return bool
+	return bool,err
 end
 function multiPoint:findColor(returnType)--区域找色
 assert(self.Area, "findColor没有传入Area")
@@ -357,7 +357,7 @@ local color={}
 			pos=self[k]:getXYtoPoint(),
 			color=Color3B(v.Dev.color),
 			fuzz=v.fuzz,
-			offset=v.DiffColor or nil
+			offset=v.Dev.offset,
 			} 
 	end)
 	local pos=screen.findColor(self.Area,color,self.fuzz,self.priority)
@@ -377,7 +377,7 @@ local color,postbl={},{}
 			pos=self[k]:getXYtoPoint(),
 			color=Color3B(v.Dev.color),
 			fuzz=v.fuzz,
-			offset=v.DiffColor or nil
+			offset=v.Dev.offset,
 			} 
 	end)
 	local result=screen.findColors(self.Area,color,self.fuzz,self.priority,(self.limit or 200))
@@ -396,7 +396,7 @@ local color,postbl={},{}
 	return false
 end
 function multiPoint:findColorEX(Ac,fuzz)--用多点找色返回的点去取比色,Ac设置number,会调用new时的Ac个点给找色
-assert(self.Area, "findColors没有传入Area")
+assert(self.Area, "findColorEX没有传入Area")
 Ac=Ac or 1
 local color,returnTbl={},{}
 	for i=1,Ac do v=self[i]
@@ -404,7 +404,7 @@ local color,returnTbl={},{}
 			pos=self[i]:getXYtoPoint(),
 			color=Color3B(v.Dev.color),
 			fuzz=v.fuzz,
-			offset=v.DiffColor or nil
+			offset=v.Dev.offset,
 		}
 	end 
 	local MainPoint={x=self[1].Dev.x,y=self[1].Dev.y}
@@ -425,7 +425,7 @@ local color,returnTbl={},{}
 		end
 end
 function multiPoint:binarizeImage()--二值化图片
-assert(self.Area, "findColors没有传入Area")
+assert(self.Area, "binarizeImage没有传入Area")
 	local img = Image.fromScreen(self.Area)
 	local data = img:binarize(self.offset)
 	self.binarize=data
