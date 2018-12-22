@@ -120,51 +120,51 @@ function getScaleArea(Area,DstMainPoint,MainPoint,Arry)	--缩放Area
 end
 
 function Print(...)
-local Print_Empty_String="empty_s"
-local Print_Empty_Table="empty_t"
-local Print_Space_str=" "
+	local _print_Space_str=" "
+	local _print_Empty_String="empty_s"
+	local _print_Empty_Table="empty_t"
+	local SpaceNum=SpaceNum or 0
+	local format=string.format
+	local arg={...}
+	local tbl={"\n"}
 	function printTable(t,SpaceNum)
-		SpaceNum=SpaceNum and SpaceNum+1
-		SpaceNum=SpaceNum or 1
-		local str=""
-		for i=1,SpaceNum,2 do
-			str=str..Print_Space_str
-		end
+	local tbl={}
 		for k,v in pairs(t) do
-			local type_t=type(v)
-			if type_t=="table" then
-				printf("%s[%s]={",string.rep("\t",SpaceNum),tostring(k))
-				printTable(v,SpaceNum)
-				printf("%s}",string.rep("\t",SpaceNum))
-			elseif type_t=="number" then
-				printf("%s[%s] = %s",string.rep("\t",SpaceNum),tostring(k),tonumber(v))
-			elseif type_t=="string" then
-				printf("%s[%s] = %s",string.rep("\t",SpaceNum),tostring(k),(v=="" and Print_Empty_String or v))
-			elseif type_t=="boolean" then
-				printf("%s[%s] = %s",string.rep("\t",SpaceNum),tostring(k),(v and "true" or "false"))
-			elseif type_t=="userdata" then
-				printf("%s[%s] = %s",string.rep("\t",SpaceNum),tostring(k),v)
-			else
-				print(str..k..':'..type_t)
+			local _type=type(v)
+			if _type=="table" then
+				tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s}\n",string.rep("\t",SpaceNum),tostring(k),printTable(v,SpaceNum+1),string.rep("\t",SpaceNum))
+			elseif _type=="number" then
+				tbl[#tbl+1]=format("%s[%s](num) = %s \n",string.rep("\t",SpaceNum),tostring(k),tonumber(v))
+			elseif _type=="string" then
+				tbl[#tbl+1]=format("%s[%s](str) = %s \n",string.rep("\t",SpaceNum),tostring(k),(v and v or  Print_Empty_String))
+			elseif _type=="boolean" then
+				tbl[#tbl+1]=format("%s[%s](bool) = %s \n",string.rep("\t",SpaceNum),tostring(k),(v and "true" or "false"))
+			elseif _type=="userdata" then 
+				tbl[#tbl+1]=format("%s[%s](usr) = %s \n",string.rep("\t",SpaceNum),tostring(k),v)
 			end
 		end
+		return table.concat(tbl)
 	end
-	local arg={...}
 	for i=1,#arg do
 		local t=arg[i]
-		local type_t=type(t)
-		if type_t=="table" then
-			print("Print Table={")
-				printTable(t)
-			print("}")
-		elseif type_t=="string" then
-			print(t=="" and Print_Empty_String or t)
-		elseif type_t=="boolean" then
-			printf("%s%s","Print boolean = ",(t and "true" or "false"))
-		elseif type_t=="userdata" then
-			printf("%s",t)
-		else
-			print(t)
-		end
+		local _type=type(t)
+			if _type=="table" then
+				tbl[#tbl+1]=format(" \n Table = { \n %s \n } \n",printTable(t,SpaceNum+1))
+			elseif _type=="string" then
+				tbl[#tbl+1]=format("%s  \n",(t and t or Print_Empty_String))
+			elseif _type=="number" then
+				tbl[#tbl+1]=format("%s  \n",t)
+			elseif _type=="boolean" then
+				tbl[#tbl+1]=format("%s  \n",(t and "true" or "false"))
+			elseif _type=="userdata" then
+				tbl[#tbl+1]=format("%s  \n",t)
+			elseif _type=="function" then
+				tbl[#tbl+1]=format("%s  \n",t)
+			elseif _type=="nil" then
+				tbl[#tbl+1]=format("%s  \n","nil")
+			else
+			
+			end
 	end
+	print(table.concat(tbl))
 end

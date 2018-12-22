@@ -62,6 +62,6 @@ _const={
 	},
 }
 
-_printcmpColorErr_=function (Cur,Dev,diff,tag,key) print(tag..":比色失败")  end
+_printcmpColorErr_=function (Cur,Dev,diff,tag,key) tag=tag or ""  end
 
 return _const

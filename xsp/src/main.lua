@@ -1,5 +1,5 @@
 if not rawget(_G, 'xmod') then
-	error("the fucking 'xmod' not find")
+	error("the 'xmod' not find")
 end
 
 -- v1.3.12
