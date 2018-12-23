@@ -2,36 +2,36 @@
 point={--单点对象
 }
 _point_metatable={
-}
-_point_metatable.__index=point
-_point_metatable.__add=function (t1,t2)
-	local p1,p2=t1.Cur,t2.Cur
-	local x,y,newPoint
-		x=p1.x+p2.x
-		y=p1.y+p2.y
-		newPoint=point:newByCur({x=x,y=y})
-	return newPoint
-end
-_point_metatable.__sub=function (t1,t2)
-	local p1,p2=t1.Cur,t2.Cur
-	local x,y,newPoint
-		x=p1.x-p2.x
-		y=p1.y-p2.y
-		newPoint=point:newByCur({x=x,y=y})
-	return newPoint
-end
-_point_metatable.__eq=function (t1,t2)
-	local p1,p2=t1.Cur,t2.Cur
-	local x,y
-	if p1.x==p2.x and p1.y==p1.y then
-		return true
+	__index=point,
+	__add=function (t1,t2)
+		local p1,p2=t1.Cur,t2.Cur
+		local x,y,newPoint
+			x=p1.x+p2.x
+			y=p1.y+p2.y
+			newPoint=point:newByCur({x=x,y=y})
+		return newPoint
+	end,
+	__sub=function (t1,t2)
+		local p1,p2=t1.Cur,t2.Cur
+		local x,y,newPoint
+			x=p1.x-p2.x
+			y=p1.y-p2.y
+			newPoint=point:newByCur({x=x,y=y})
+		return newPoint
+	end,
+	__eq=function (t1,t2)
+		local p1,p2=t1.Cur,t2.Cur
+		local x,y
+		if p1.x==p2.x and p1.y==p1.y then
+			return true
+		end
+		return false
+	end,
+	__tostring=function (p)
+		return string.format("point<Dev=[x=%.0f,y=%.0f] Cur=[x=%.2f,y=%.2f]>",
+			p.Dev.x,p.Dev.y,p.Cur.x,p.Cur.y) 
 	end
-	return false
-end
-_point_metatable.__tostring=function (p)
-	return string.format("point<Dev=[x=%.0f,y=%.0f] Cur=[x=%.2f,y=%.2f]>",
-				p.Dev.x,p.Dev.y,p.Cur.x,p.Cur.y) 
-end
+}
 function point:new(Base)--创建单点对象
 	local o={
 		_type="point",
@@ -157,8 +157,8 @@ local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
 		local ofr,ofg,ofb=offColor.r,offColor.g,offColor.b	--偏色rgb
 		local ar,ag,ab=r-ofr,g-ofg,b-ofb	--max
 		local ir,ig,ib=r+ofr,g+ofg,b+ofb	--min
---Print({["maxs"]={ar,ag,ab},["mins"]={ir,ig,ib},["Cur"]={lr,lg,lb}})
-		if ((ar<lr)and(ag<lg)and(ab<lb)) and  --max<color<min
+--		Print({["maxs"]={ar,ag,ab},["mins"]={ir,ig,ib},["Cur"]={lr,lg,lb}})
+		if ((ar<lr)and(ag<lg)and(ab<lb)) and  --max< color <min
 			((lr<ir)and(lg<ig)and(lb<ib)) then
 			return true
 		end
@@ -238,12 +238,26 @@ end
 
 multiPoint={--多点对象
 }
+_multiPoint_metatable={
+	__index=multiPoint,
+	__tostring=function (t,Num)
+		local str="multiPoint< \n"
+		for k,v in ipairs(t) do
+			str=str..tostring(v).."\n"
+		end
+		if t.Area then str=str..string.format("%s",t.Area) end
+		if t.index then str=str..string.format("%s",t.index) end
+		str=str..">"
+		return str
+	end
+}
 function multiPoint:new(Base)--创建多点对象
 	local o={
 		_type="multiPoint",
 		_tag=Base._tag,
 		fuzz=Base.fuzz or 95,--模糊值(选填)
 		index=Base.index,--点击范围(选填)
+		indexN=Base.indexN or 1,
 		Area=Base.Area,--范围坐标{x1,y1,x2,y2}(findcolor等需要范围坐标的必选)
 		MainPoint=Base.MainPoint,--锚点{x,y}(选填)
 		Anchor=Base.Anchor,--锚点(选填)
@@ -276,10 +290,7 @@ function multiPoint:new(Base)--创建多点对象
 	end
 	o.index=(o.index and getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
 	o.Area=(o.Area and getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
-	--if o.index then o.index=getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) end--如果有设置点击点
-	--if o.Area then o.Area=getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) end	--缩放范围
-	
-	setmetatable(o,{__index = self})
+	setmetatable(o,_multiPoint_metatable)
 	return o
 end
 function multiPoint:newBypoint(Base)--由单点对象创建多点对象
@@ -288,6 +299,7 @@ function multiPoint:newBypoint(Base)--由单点对象创建多点对象
 		_tag=Base._tag,
 		fuzz=Base.fuzz or 95,--模糊值(选填)
 		index=Base.index,--点击范围(选填)
+		indexN=Base.indexN or 1,
 		Area=Base.Area,--范围坐标{x1,y1,x2,y2}(findcolor等需要范围坐标的必选)
 		MainPoint=Base.MainPoint,--锚点{x,y}(选填)
 		Anchor=Base.Anchor,--锚点(选填)
@@ -298,17 +310,23 @@ function multiPoint:newBypoint(Base)--由单点对象创建多点对象
 	o.Arry=Base.Arry or _const.Arry
 	------------------------------------------------------------------------------
 	table.foreachi(Base,function(k,v) o[k]=v end)
-	setmetatable(o,{__index=self})
+	setmetatable(o,_multiPoint_metatable)
 	return o
 end
 function multiPoint:Click(T)
+assert(self.index, "Click没有传入index")
 math.randomseed(tonumber(string.reverse(tostring(os.milliTime())):sub(1,6)))
 local p=self.index
-local point1,point2=p:tl(),p:br()
-local point={math.random(point1.x,point2.x),math.random(point1.y,point2.y)}
-	touch.down(1,point[1],point[2])
+local point,point1,point2
+	if #p==2 then
+		point=self.index
+	else
+		point1,point2=p:tl(),p:br()
+		point={math.random(point1.x,point2.x),math.random(point1.y,point2.y)}
+	end
+	touch.down(self.indexN,point[1],point[2])
 	slp()
-	touch.up(1,point[1],point[2])
+	touch.up(self.indexN,point[1],point[2])
 	slp(T)
 end
 function multiPoint:AllClick(T)
@@ -453,6 +471,12 @@ function multiPoint:getAllpoint()
 	table.foreachi(self,function (k,v) tbl[k]=v end)
 	return tbl	
 end
+function multiPoint:showHUD(T)
+local hud=HUD:new({Area=self.Area})
+hud:show()
+slp(T)
+hud:clear()
+end
 function multiPoint:printbinarize()--打印二值化data
 local data=self.binarize
 	for _,v in pairs(data) do
@@ -476,15 +500,22 @@ HUD={
 }
 function HUD:new(Baseinfo)--创建HUD
 	local o={
-		origin=Baseinfo.point[1],
-		size=Size(Baseinfo.point[2]-Baseinfo.point[1]),
+		origin=nil,
+		size=nil,
 		color=Baseinfo.color or "0xffffffff",
 		bg=Baseinfo.bg or "0xffffffff",
-		textsize=Baseinfo.textsize*_const.Arry.AppurtenantScaleMode or 20,
+		textsize=(Baseinfo.textsize and Baseinfo.textsize*_const.Arry.AppurtenantScaleMode or 20),
 		id=createHUD(),
 		pos=Baseinfo.pos or 0,
 		text=Baseinfo.text or "",
 	}
+	if Baseinfo.point then 
+		o.origin=Baseinfo.point[1]
+		o.size=Size(Baseinfo.point[2]-Baseinfo.point[1])
+	elseif Baseinfo.Area then
+		o.origin=Baseinfo.Area:tl()
+		o.size=Baseinfo.Area:size()
+	end
 	setmetatable(o,{__index = self} )	
 	return o
 end
@@ -495,6 +526,10 @@ end
 function HUD:hide()
 local o=self:getdata()
 	showHUD(self.id,"",o.size,"0x00000000","0x00000000",o.pos,o.x,o.y,o.width,o.height)
+end
+function HUD:clear()
+	hideHUD(self.id)
+	self=nil
 end
 function HUD:getdata(text)
 	local o={

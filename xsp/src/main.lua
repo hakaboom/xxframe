@@ -2,7 +2,7 @@ if not rawget(_G, 'xmod') then
 	error("the 'xmod' not find")
 end
 -- 暂时不会开群,有什么不会的可以在开发者群里问
--- v1.3.15
+-- v1.3.16
 --  框架手册			 https://www.zybuluo.com/hakaboom/note/1370480
 --	叉叉2.0开发手册   https://www.zybuluo.com/xxzhushou/note/1271276
 --	lua 5.3手册	  	 https://cloudwu.github.io/lua53doc/contents.html

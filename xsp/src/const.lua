@@ -63,8 +63,7 @@ _const={
 }
 
 _GetSpaceNum = function () 
-return
-	{
+return	{
 		"\t",
 		"\t\t",
 		"\t\t\t",
@@ -79,6 +78,6 @@ return
 	}
 end
 
-_printcmpColorErr_=function (Cur,Dev,tag,key) tag=tag or "" return  end
+_printcmpColorErr_ = function (Cur,Dev,tag,key) tag=tag or "" return  end
 
 return _const

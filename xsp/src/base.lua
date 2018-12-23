@@ -122,9 +122,15 @@ end
 
 function getScaleArea(Area,DstMainPoint,MainPoint,Arry)	--缩放Area
 	if DstMainPoint then
+		if #Area==2 then return 
+		{getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)} end
 		Area[1],Area[2]=getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)
 		Area[3],Area[4]=getScaleXY({x=Area[3],y=Area[4]},MainPoint,DstMainPoint,Arry)
 	else
+		if #Area==2 then return 
+				{(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left,
+				(Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top}
+		end
 		Area[1]=(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
 		Area[3]=(Area[3]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
 		Area[2]=(Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
@@ -152,10 +158,12 @@ function Print(...)
 	local tbl={}
 		for k,v in pairs(t) do
 			local _type=type(v)
-			if _type=="table" and k~="_G" and(not v.package) then
+			if _type=="table" and (v._type=="point" or v._type=="multiPoint")then
+				tbl[#tbl+1]=format("%s[%s](%s) = %s \n",_SpaceNumRep(Num),tostring(k),v._type ,tostring(v))
+			elseif _type=="table" and k~="_G" and(not v.package) then
 				tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s}\n",_SpaceNumRep(Num),tostring(k),printTable(v,Num),_SpaceNumRep(Num))
 			elseif _type=="table" and (v.package) then
-				tbl[#tbl+1]=format("%s[%s](%s) = %s",_SpaceNumRep(Num),tostring(k),_type,v)
+				tbl[#tbl+1]=format("%s[%s](%s) = %s \n",_SpaceNumRep(Num),tostring(k),_type,v)
 			elseif _type=="number" then
 				tbl[#tbl+1]=format("%s[%s](num) = %s \n",_SpaceNumRep(Num),tostring(k),v)
 			elseif _type=="string" then
