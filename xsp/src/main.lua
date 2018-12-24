@@ -1,12 +1,12 @@
 if not rawget(_G, 'xmod') then
 	error("the 'xmod' not find")
 end
--- 暂时不会开群,有什么不会的可以在开发者群里问
--- v1.3.16
+-- 暂时不会开群,有什么不会的可以在开发者群里问,或者在GitHub上留言
+-- v1.3.17
 --  框架手册			 https://www.zybuluo.com/hakaboom/note/1370480
 --	叉叉2.0开发手册   https://www.zybuluo.com/xxzhushou/note/1271276
 --	lua 5.3手册	  	 https://cloudwu.github.io/lua53doc/contents.html
---	github		   	 https://github.com/hakaboom/xxframe 
+--	GitHub		   	 https://github.com/hakaboom/xxframe 
 --把自定义取色放到叉叉集成开发环境下的data.lua,可以直接覆盖,抓图的时候用Anchor
 --打印函数为Print()没有覆盖print()
 --初始化必须调用
@@ -19,8 +19,8 @@ DevScreen={	--开发分辨率
 	Width=1920,Height=1080,
 }
 CurScreen={	--本机分辨率
-	Top=0,Bottom=0,Left=0,Right=0,
-	Width=1280,Height=720,
+	Top=0,Bottom=0,Left=93,Right=93,
+	Width=2436,Height=1125,
 }
 _K=System:new(DevScreen,CurScreen,1,"Height","Height")
 screen.init(1)

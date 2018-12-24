@@ -77,7 +77,31 @@ return	{
 		"\t\t\t\t\t\t\t\t\t\t\t",
 	}
 end
-
-_printcmpColorErr_ = function (Cur,Dev,tag,key) tag=tag or "" return  end
+_printcustomData_ = function (_type)
+	if _type=="point" then
+		return _printPoint_
+	elseif _type=="multiPoint" then
+		return _printmultiPoint_ 
+	end
+end
+_printcmpColorErr_ = function (Cur,Dev,tag,key) 
+	tag=tag or "" 
+	return  
+end
+_printPoint_ = function (p)
+	return string.format("point<x=%.2f,y=%.2f>",p.Cur.x,p.Cur.y)
+end
+_printmultiPoint_ = function (multi,Num)
+Num=Num or ""
+	local str="multiPoint< \n"
+		for k,v in ipairs(multi) do
+			str=str..string.format("%s[x=%.2f,y=%.2f]>\n",
+			Num,v.Cur.x,v.Cur.y)
+		end
+		if multi.Area then str=str..string.format("%s%s",Num,multi.Area) end
+		if multi.index then str=str..string.format("%s%s",multi.index) end
+		str=str..">"
+	return str
+end
 
 return _const

@@ -87,6 +87,7 @@ function split(str,pattern,content)--字符串分割
 		str=str..pattern
 		pattern="(.-)"..pattern
 	end
+	
 	for v in string.gmatch(str,pattern) do
 		result[#result+1]=v
 	end
@@ -101,6 +102,52 @@ local pattern = "[^%w%d%?=&:/._%-%* ]"
     end)
     s = string.gsub(s, " ", "+")
     return s
+end
+
+function string.trim(s)
+	return s:match'^%s*(.*%S)'  or ''
+end
+
+function screenPoint(Table,n)
+local abs=math.abs
+local sqrt=math.sqrt
+	local new = {}
+	for i = 1, #Table do
+		new[i] = {}
+		for k = 1, #Table do
+			if k ~= i then
+--			local distance = sqrt((Table[k].x-Table[i].x)^2+(Table[k].y-Table[i].y)^2)
+--				if distance <= n then
+--					new[i][#new[i]+1] = k
+--				end
+--			end
+				if abs(Table[k].x-Table[i].x)<=n and abs(Table[k].y-Table[i].y)<=n then
+					new[i][#new[i]+1] = k
+				end
+			end
+		end
+	end
+--根据new[i]的长度 排出一个table
+	local length = {}
+	for i = 1, #new do
+		length[i] = {length=#new[i],key=i}
+	end
+	table.sort(length,function(a,b) return a.length>b.length end)
+	for i = 1, #length do
+		local key = length[i].key
+		if new[key] then
+			for k = 1, #new[key] do
+				new[new[key][k]] = false
+			end
+		end
+	end
+	local retPoint = {}
+	for i = 1, #new do
+		if new[i] then
+			retPoint[#retPoint+1] = Table[i]
+		end
+	end
+	return retPoint
 end
 
 function getScaleMainPoint(MainPoint,Anchor,Arry)	--缩放锚点
@@ -141,38 +188,37 @@ function getScaleArea(Area,DstMainPoint,MainPoint,Arry)	--缩放Area
 	return  Rect(Area[1],Area[2],width,height)
 end
 
-function Print(...)
-	local SpaceNum=_GetSpaceNum()
-	local Num=0
-	local format=string.format
-	local arg={...}
-	local tbl={"\n"}
-	local function _SpaceNumRep(Num)
-		if SpaceNum[Num] then
-			return SpaceNum[Num]
-		end
-		return Num == 0 and '' or string.rep('\t',Num)
+function _SpaceNumRep(SpaceNum,Num)
+	if SpaceNum[Num] then
+		return SpaceNum[Num]
 	end
+	return Num == 0 and '' or string.rep('\t',Num)
+end
+	
+function Print(...)
+local SpaceNum=_GetSpaceNum()
+local Num=0
+local format=string.format
+local arg={...}
+local tbl={"\n"}
 	function printTable(t,Num)
 	Num=Num+1
 	local tbl={}
 		for k,v in pairs(t) do
 			local _type=type(v)
-			if _type=="table" and (v._type=="point" or v._type=="multiPoint")then
-				tbl[#tbl+1]=format("%s[%s](%s) = %s \n",_SpaceNumRep(Num),tostring(k),v._type ,tostring(v))
+			local _Space=_SpaceNumRep(SpaceNum,Num)
+			if _type=="table" and (v._type=="point" or v._type=="multiPoint") then
+				tbl[#tbl+1]=format("%s[%s] = %s",_Space,tostring(k),(_printcustomData_(v._type))(v,_SpaceNumRep(SpaceNum,Num+1)))
 			elseif _type=="table" and k~="_G" and(not v.package) then
-				tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s}\n",_SpaceNumRep(Num),tostring(k),printTable(v,Num),_SpaceNumRep(Num))
+				tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s }",_Space,tostring(k),printTable(v,Num),_SpaceNumRep(SpaceNum,Num))
 			elseif _type=="table" and (v.package) then
-				tbl[#tbl+1]=format("%s[%s](%s) = %s \n",_SpaceNumRep(Num),tostring(k),_type,v)
-			elseif _type=="number" then
-				tbl[#tbl+1]=format("%s[%s](num) = %s \n",_SpaceNumRep(Num),tostring(k),v)
-			elseif _type=="string" then
-				tbl[#tbl+1]=format("%s[%s](str) = %s \n",_SpaceNumRep(Num),tostring(k),(v=="" and "empty_s" or v))
+				tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),_type,v)
 			elseif _type=="boolean" then
-				tbl[#tbl+1]=format("%s[%s](bool) = %s \n",_SpaceNumRep(Num),tostring(k),(v and "true" or "false"))
-			elseif _type=="userdata" then 
-				tbl[#tbl+1]=format("%s[%s](usr) = %s \n",_SpaceNumRep(Num),tostring(k),v)
+				tbl[#tbl+1]=format("%s[%s](bool) = %s",_Space,tostring(k),(v and "true" or "false"))
+			else
+				tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),string.sub(_type,1,3),v)
 			end
+			tbl[#tbl+1]="\n"
 		end
 		return table.concat(tbl)
 	end
@@ -181,23 +227,22 @@ function Print(...)
 		local t=arg[i]
 		local _type=type(t)
 			if _type=="table" then
-				tbl[#tbl+1]=format(" \n Table = { \n %s \n } \n",printTable(t,Num))
+				if t._type then 
+					tbl[#tbl+1]=format("%s",(_printcustomData_(t._type))(t))
+				else
+					tbl[#tbl+1]=format("Table = { \n %s }",printTable(t,Num))
+				end
 			elseif _type=="string" then
-				tbl[#tbl+1]=format("%s, ",(t=="" and "empty_s"  or t))
-			elseif _type=="number" then
-				tbl[#tbl+1]=format("%s, ",t)
+				tbl[#tbl+1]=format("%s",(t=="" and "empty_s"  or t))
 			elseif _type=="boolean" then
-				tbl[#tbl+1]=format("%s, ",(t and "true" or "false"))
-			elseif _type=="userdata" then
-				tbl[#tbl+1]=format("%s, ",t)
-			elseif _type=="function" then
-				tbl[#tbl+1]=format("%s, ",t)
+				tbl[#tbl+1]=format("%s",(t and "true" or "false"))
 			elseif _type=="nil" then
-				tbl[#tbl+1]=format("%s, ","nil")
+				tbl[#tbl+1]=format("%s","nil")
 			else
-			
+				tbl[#tbl+1]=format("%s",t)
 			end
+		tbl[#tbl+1]=","
 	end
-	
+	tbl[#tbl]=""
 print(table.concat(tbl))
 end

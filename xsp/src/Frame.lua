@@ -28,8 +28,7 @@ _point_metatable={
 		return false
 	end,
 	__tostring=function (p)
-		return string.format("point<Dev=[x=%.0f,y=%.0f] Cur=[x=%.2f,y=%.2f]>",
-			p.Dev.x,p.Dev.y,p.Cur.x,p.Cur.y) 
+		return _printPoint_(p)
 	end
 }
 function point:new(Base)--创建单点对象
@@ -240,15 +239,8 @@ multiPoint={--多点对象
 }
 _multiPoint_metatable={
 	__index=multiPoint,
-	__tostring=function (t,Num)
-		local str="multiPoint< \n"
-		for k,v in ipairs(t) do
-			str=str..tostring(v).."\n"
-		end
-		if t.Area then str=str..string.format("%s",t.Area) end
-		if t.index then str=str..string.format("%s",t.index) end
-		str=str..">"
-		return str
+	__tostring=function (multi)
+		return _printmultiPoint_(multi)
 	end
 }
 function multiPoint:new(Base)--创建多点对象
@@ -301,7 +293,7 @@ function multiPoint:newBypoint(Base)--由单点对象创建多点对象
 		index=Base.index,--点击范围(选填)
 		indexN=Base.indexN or 1,
 		Area=Base.Area,--范围坐标{x1,y1,x2,y2}(findcolor等需要范围坐标的必选)
-		MainPoint=Base.MainPoint,--锚点{x,y}(选填)
+		MainPoint=Base.MainPoint ,--锚点{x,y}(选填)
 		Anchor=Base.Anchor,--锚点(选填)
 		DstMainPoint=Base.DstMainPoint,--按照此锚点为基准点进行换算(选填)
 		offset=Base.offset,--偏色值(用于二值化 选填)
@@ -427,7 +419,7 @@ local color,returnTbl={},{}
 	end 
 	local MainPoint={x=self[1].Dev.x,y=self[1].Dev.y}
 	local initpoint=screen.findColors(self.Area,color,(fuzz or self.fuzz),self.priority,999)
---	print(#initpoint)
+		--print(#initpoint)
 		if #initpoint > 0 then
 			local Allpoint=self:getAllpoint()
 				for k,v in ipairs(initpoint) do
@@ -488,7 +480,6 @@ print(string.format(">>>>>>>>>>>>>>>>%s",(self._tag or "")))
 	table.foreachi(self, function(k,v) 
 		self[k]:printXY()
 	end)
-print(">>>>>>>>>>>>>>>>")
 end
 function multiPoint:printSelf()
 	Print(self)
@@ -675,9 +666,6 @@ function OCR:new(data)--{Edition="tessocr_3.02.02",path="res/",lang="chi_sim"}
 	return o
 end
 function OCR:getText(data)--{rect={},diff={},PSM=6,white="123456789"}
-	string.trim = function(s)
-			return s:match'^%s*(.*%S)'  or ''
-	end
 	if data.binarize then Data=data.binarize else --二值化图片
 		local img=Image.fromScreen(data.Rect)
 		local Data=img:binarize(data.diff)	
