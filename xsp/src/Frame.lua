@@ -153,6 +153,7 @@ local abs=math.abs
 local r ,g ,b =self.Dev.color.r,self.Dev.color.g,self.Dev.color.b	
 local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
 	if self.Dev.offset then
+		local offColor=self.Dev.offset
 		local ofr,ofg,ofb=offColor.r,offColor.g,offColor.b	--偏色rgb
 		local ar,ag,ab=r-ofr,g-ofg,b-ofb	--max
 		local ir,ig,ib=r+ofr,g+ofg,b+ofb	--min
@@ -421,10 +422,10 @@ local color,returnTbl={},{}
 	local initpoint=screen.findColors(self.Area,color,(fuzz or self.fuzz),self.priority,999)
 		--print(#initpoint)
 		if #initpoint > 0 then
-			local Allpoint=self:getAllpoint()
+			local Allpoint=TableCopy(self:getAllpoint())
 				for k,v in ipairs(initpoint) do
 					local Dst={x=initpoint[k].x,y=initpoint[k].y}
-					table.foreachi(Allpoint,function(k,v)v.MainPoint=MainPoint v.DstMainPoint=Dst v:refresh() end)
+					table.foreachi(Allpoint,function(k,v) v.MainPoint=MainPoint v.DstMainPoint=Dst v:refresh() end)
 					local multipoint=multiPoint:newBypoint(Allpoint)
 						multipoint:getColor()
 						if multipoint:cmpColor() then
@@ -469,6 +470,11 @@ hud:show()
 slp(T)
 hud:clear()
 end
+function multiPoint:offsetXY(x,y,offsetMode)--偏移坐标
+	table.foreachi(self, function(k,v) 
+		v:offsetXY(x,y,offsetMode)
+	end)
+end
 function multiPoint:printbinarize()--打印二值化data
 local data=self.binarize
 	for _,v in pairs(data) do
@@ -489,23 +495,23 @@ end
 --没用2.0 用的旧得api
 HUD={
 }
-function HUD:new(Baseinfo)--创建HUD
+function HUD:new(Base)--创建HUD
 	local o={
 		origin=nil,
 		size=nil,
-		color=Baseinfo.color or "0xffffffff",
-		bg=Baseinfo.bg or "0xffffffff",
-		textsize=(Baseinfo.textsize and Baseinfo.textsize*_const.Arry.AppurtenantScaleMode or 20),
+		color=Base.color or "0xffffffff",
+		bg=Base.bg or "0xffffffff",
+		textsize=(Base.textsize or 20)*_const.Arry.AppurtenantScaleMode,
 		id=createHUD(),
-		pos=Baseinfo.pos or 0,
-		text=Baseinfo.text or "",
+		pos=Base.pos or 0,
+		text=Base.text or "",
 	}
-	if Baseinfo.point then 
-		o.origin=Baseinfo.point[1]
-		o.size=Size(Baseinfo.point[2]-Baseinfo.point[1])
-	elseif Baseinfo.Area then
-		o.origin=Baseinfo.Area:tl()
-		o.size=Baseinfo.Area:size()
+	if Base.point then 
+		o.origin=Base.point[1]
+		o.size=Size(Base.point[2]-Base.point[1])
+	elseif Base.Area then
+		o.origin=Base.Area:tl()
+		o.size=Base.Area:size()
 	end
 	setmetatable(o,{__index = self} )	
 	return o
@@ -521,6 +527,12 @@ end
 function HUD:clear()
 	hideHUD(self.id)
 	self=nil
+end
+function HUD:reset(Base)
+	self.text=Base.text
+	self.color=Base.color
+	self.bg=Base.bg
+	self.size=Base.size
 end
 function HUD:getdata(text)
 	local o={
@@ -554,9 +566,9 @@ end
 function runTime:setcheckTime(T)--设置检查点T为间隔时间/秒 必填
 	self.Time=T*1000
 end
-function runTime:checkTime()--检查时间
+function runTime:checkTime(bool)--检查时间
 	if self.startTime+self.Time<os.milliTime() then
-		self:resetTime()	--重设起点时间
+		if bool then self:resetTime() end	--重设起点时间
 		return true
 	end
 	return false
@@ -875,7 +887,7 @@ end
 function System:setKeepTime(T)--设置截图前的延迟
 	self.KeepTime=T
 end
-function System:addSystemData(key , value)
+function System:addSystemData(key,value)
 	self.SystemData[key] = value
 end
 function System:getSystemData()--一些系统的属性,按照需求自己添加
