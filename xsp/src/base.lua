@@ -200,7 +200,7 @@ local SpaceNum=_GetSpaceNum()
 local Num=0
 local format=string.format
 local arg={...}
-local tbl={"\n"}
+local tbl={}
 	function printTable(t,Num)
 	Num=Num+1
 	local tbl={}
@@ -230,7 +230,7 @@ local tbl={"\n"}
 				if t._type then 
 					tbl[#tbl+1]=format("%s",(_printcustomData_(t._type))(t))
 				else
-					tbl[#tbl+1]=format("Table = { \n %s }",printTable(t,Num))
+					tbl[#tbl+1]=format("\n Table = { \n %s }",printTable(t,Num))
 				end
 			elseif _type=="string" then
 				tbl[#tbl+1]=format("%s",(t=="" and "empty_s"  or t))

@@ -148,8 +148,6 @@ local point=self.Cur
 		self.Cur.color=Color3B(DstColor.r,DstColor.g,DstColor.b)
 end
 function point:cmpColor()--比色
-local floor=math.floor
-local abs=math.abs
 local r ,g ,b =self.Dev.color.r,self.Dev.color.g,self.Dev.color.b	
 local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
 	if self.Dev.offset then
@@ -157,14 +155,14 @@ local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
 		local ofr,ofg,ofb=offColor.r,offColor.g,offColor.b	--偏色rgb
 		local ar,ag,ab=r-ofr,g-ofg,b-ofb	--max
 		local ir,ig,ib=r+ofr,g+ofg,b+ofb	--min
---		Print({["maxs"]={ar,ag,ab},["mins"]={ir,ig,ib},["Cur"]={lr,lg,lb}})
+	--	Print({["maxs"]={ar,ag,ab},["mins"]={ir,ig,ib},["Cur"]={lr,lg,lb}})
 		if ((ar<lr)and(ag<lg)and(ab<lb)) and  --max< color <min
 			((lr<ir)and(lg<ig)and(lb<ib)) then
 			return true
 		end
 		return false
 	else
-		local fuzz = floor(0xff * (100 - self.fuzz) * 0.01)
+		local fuzz =math.floor(0xff * (100 - self.fuzz) * 0.01)
 		local r3,g3,b3=(lr-r),(lg-g),(lb-b)
 		local diff=math.sqrt(r3^2+g3^2+b3^2)
 			if diff>fuzz then
@@ -264,22 +262,27 @@ function multiPoint:new(Base)--创建多点对象
 	------------------------------------------------------------------------------
 	if o.DstMainPoint then	
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
+			v.fuzz=o.fuzz
 			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,Arry)
 			o[k]=point:newBymulti(v)	--缩放
 		end)
 	elseif not o.Anchor then 
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
+			v.fuzz=o.fuzz
 			v.Cur.x=(v.x-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
 			v.Cur.y=(v.y-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
 			v.MainPoint=o.MainPoint
 			o[k]=point:newBymulti(v)
 		end)
+		
 	else	
 		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)	--计算锚点
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
+			v.fuzz=o.fuzz
 			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,o.Arry)
 			o[k]=point:newBymulti(v)
 		end)
+		
 	end
 	o.index=(o.index and getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
 	o.Area=(o.Area and getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
@@ -371,6 +374,7 @@ local color={}
 			offset=v.Dev.offset,
 			} 
 	end)
+	Print(color)
 	local pos=screen.findColor(self.Area,color,self.fuzz,self.priority)
 		if pos ~= Point.INVALID then
 			if returnType=="getXY" then
