@@ -15,48 +15,48 @@ _const={
 	Arry=nil,
 	MainPointScale={
 		["Middle"]=function(point,Arry)
-			x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-			y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+			local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
 			return x,y
 		end,
 		["Left"]=function (point,Arry)--左中
-			x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
-			y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
+			local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
 			return x,y
 		end,
 		["Right"]=function (point,Arry)--右中
-			x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-			y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+			local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
 			return x,y
 		end,
 		["Top"]=function (point,Arry)--上中 
-			x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-			y=MainPoint.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+			local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+			local y=MainPoint.y*Arry.MainPointsScaleMode+Arry.Cur.Top
 			return x,y
 		end,
 		["Bottom"]=function (point,Arry)--下中
-			x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-			y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+			local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
 			return x,y
 		end,
 		["LeftTop"]=function (point,Arry)--左上
-			x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
-			y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+			local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
+			local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
 			return x,y
 		end,
 		["LeftBottom"]=function (point,Arry)--左下
-			x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
-			y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
+			local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
 			return x,y
 		end,
 		["RightTop"]=function (point,Arry) --右上角
-			x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-			y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+			local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+			local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
 			return x,y
 		end,
 		["RightBottom"]=function (point,Arry) --右下角
-			x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-			y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+			local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
 			return x,y
 		end,
 	},

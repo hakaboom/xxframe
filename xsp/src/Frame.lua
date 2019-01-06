@@ -8,7 +8,7 @@ _point_metatable={
 		local x,y,newPoint
 			x=p1.x+p2.x
 			y=p1.y+p2.y
-			newPoint=point:newByCur({x=x,y=y})
+				newPoint=point:newByCur({x=x,y=y})
 		return newPoint
 	end,
 	__sub=function (t1,t2)
@@ -16,13 +16,13 @@ _point_metatable={
 		local x,y,newPoint
 			x=p1.x-p2.x
 			y=p1.y-p2.y
-			newPoint=point:newByCur({x=x,y=y})
+				newPoint=point:newByCur({x=x,y=y})
 		return newPoint
 	end,
 	__eq=function (t1,t2)
 		local p1,p2=t1.Cur,t2.Cur
 		local x,y
-		if p1.x==p2.x and p1.y==p1.y then
+		if (p1.x==p2.x) and (p1.y==p1.y) then
 			return true
 		end
 		return false
@@ -284,8 +284,8 @@ function multiPoint:new(Base)--创建多点对象
 		end)
 		
 	end
-	o.index=(o.index and getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
-	o.Area=(o.Area and getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
+		o.index=(o.index and getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
+		o.Area=(o.Area and getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
 	setmetatable(o,_multiPoint_metatable)
 	return o
 end
@@ -305,21 +305,24 @@ function multiPoint:newBypoint(Base)--由单点对象创建多点对象
 	}
 	o.Arry=Base.Arry or _const.Arry
 	------------------------------------------------------------------------------
-	table.foreachi(Base,function(k,v) o[k]=v end)
+		table.foreachi(Base,function(k,v) o[k]=v end)
 	setmetatable(o,_multiPoint_metatable)
 	return o
 end
 function multiPoint:Click(T)
-assert(self.index, "Click没有传入index")
-math.randomseed(tonumber(string.reverse(tostring(os.milliTime())):sub(1,6)))
-local p=self.index
-local point,point1,point2
-	if #p==2 then
-		point=self.index
-	else
-		point1,point2=p:tl(),p:br()
-		point={math.random(point1.x,point2.x),math.random(point1.y,point2.y)}
-	end
+	assert(self.index, "Click没有传入index")
+	math.randomseed(tonumber(string.reverse(tostring(os.milliTime())):sub(1,6)))
+		local p=self.index
+		local point,point1,point2
+			if #p==2 then
+				point=self.index
+			else
+				point1,point2=p:tl(),p:br()
+				point={
+					math.random(point1.x,point2.x),
+					math.random(point1.y,point2.y)
+				}
+			end
 	touch.down(self.indexN,point[1],point[2])
 	slp()
 	touch.up(self.indexN,point[1],point[2])
@@ -331,28 +334,28 @@ function multiPoint:AllClick(T)
 	end
 end
 function multiPoint:getColor()
-_K:keep(true)
-	for k,v in ipairs(self) do
-		self[k]:getColor()
-	end
+	_K:keep(true)
+		for k,v in ipairs(self) do
+			self[k]:getColor()
+		end
 end
 function multiPoint:getBilinear()
-_K:keep(true)
-	for k,v in ipairs(self) do
-		self[k]:getBilinear()
-	end
+	_K:keep(true)
+		for k,v in ipairs(self) do
+			self[k]:getBilinear()
+		end
 end
 function multiPoint:cmpColor()--比色 可以在这里取消注释进行测试时候的判断
-local floor=math.floor
-  for k,v in ipairs(self) do
-		local  res=v:cmpColor()
-		if not res then
-			local err=_printcmpColorErr_(v.Cur.color,v.Dev.color,self._tag,k)
-			return false,err
-		end
-  end
-	printf(">>>>>>>>>>>>>>>>%s:true",(self._tag or ""))
-  return true
+	local floor=math.floor
+ 		for k,v in ipairs(self) do
+			local  res=v:cmpColor()
+				if not res then
+					local err=_printcmpColorErr_(v.Cur.color,v.Dev.color,self._tag,k)
+				return false,err
+			end
+  	end
+		printf(">>>>>>>>>>>>>>>>%s:true",(self._tag or ""))
+  	return true
 end
 function multiPoint:getandCmpColor(touchmode,T)
 	self[_const.GetColorMode](self)
@@ -365,16 +368,16 @@ function multiPoint:getandCmpColor(touchmode,T)
 	return bool,err
 end
 function multiPoint:findColor(returnType)--区域找色
-assert(self.Area, "findColor没有传入Area")
-local color={}
-	table.foreachi(self,function (k,v) color[k]={
-			pos=self[k]:getXYtoPoint(),
-			color=Color3B(v.Dev.color),
-			fuzz=v.fuzz,
-			offset=v.Dev.offset,
-			} 
-	end)
-	Print(color)
+	assert(self.Area, "findColor没有传入Area")
+	local color={}
+		table.foreachi(self,function (k,v) color[k]={
+				pos=self[k]:getXYtoPoint(),
+				color=Color3B(v.Dev.color),
+				fuzz=v.fuzz,
+				offset=v.Dev.offset,
+				} 
+		end)
+	--Print(color)
 	local pos=screen.findColor(self.Area,color,self.fuzz,self.priority)
 		if pos ~= Point.INVALID then
 			if returnType=="getXY" then
@@ -386,15 +389,15 @@ local color={}
 	return false
 end
 function multiPoint:findColors(returnType)--区域多点找色
-assert(self.Area, "findColors没有传入Area")
-local color,postbl={},{}
-	table.foreachi(self,function (k,v) color[k]={
-			pos=self[k]:getXYtoPoint(),
-			color=Color3B(v.Dev.color),
-			fuzz=v.fuzz,
-			offset=v.Dev.offset,
-			} 
-	end)
+	assert(self.Area, "findColors没有传入Area")
+	local color,postbl={},{}
+		table.foreachi(self,function (k,v) color[k]={
+				pos=self[k]:getXYtoPoint(),
+				color=Color3B(v.Dev.color),
+				fuzz=v.fuzz,
+				offset=v.Dev.offset,
+				} 
+		end)
 	local result=screen.findColors(self.Area,color,self.fuzz,self.priority,(self.limit or 200))
 		if #result > 0 then
 			if returnType=="getXY" then
@@ -411,17 +414,17 @@ local color,postbl={},{}
 	return false
 end
 function multiPoint:findColorEX(Ac,fuzz)--用多点找色返回的点去取比色,Ac设置number,会调用new时的Ac个点给找色
-assert(self.Area, "findColorEX没有传入Area")
-Ac=Ac or 1
-local color,returnTbl={},{}
-	for i=1,Ac do v=self[i]
-		color[i]={
-			pos=self[i]:getXYtoPoint(),
-			color=Color3B(v.Dev.color),
-			fuzz=v.fuzz,
-			offset=v.Dev.offset,
-		}
-	end 
+	assert(self.Area, "findColorEX没有传入Area")
+	Ac=Ac or 1
+	local color,returnTbl={},{}
+		for i=1,Ac do v=self[i]
+			color[i]={
+				pos=self[i]:getXYtoPoint(),
+				color=Color3B(v.Dev.color),
+				fuzz=v.fuzz,
+				offset=v.Dev.offset,
+			}
+		end 
 	local MainPoint={x=self[1].Dev.x,y=self[1].Dev.y}
 	local initpoint=screen.findColors(self.Area,color,(fuzz or self.fuzz),self.priority,999)
 		--print(#initpoint)
@@ -755,48 +758,48 @@ local t=self.steplen/100
 end
 function Slide:Close()--双指缩小
 local x1,y1,x2,y2
-local Move={
-	{x=self.MoveStart.x,y=self.MoveStart.y},
-	{x=self.MoveEnd.x,y=self.MoveEnd.y},
-}
-local middle={
-	x=math.abs(self.MoveStart.x-self.MoveEnd.y),
-	y=math.abs(self.MoveStart.y-self.MoveEnd.y),
-}
-local t=self.steplen/100
-	touch.down(self.index,Move[1].x,Move[1].y)
-	touch.down(self.index+1,Move[2].x,Move[2].y)
-	for i=0,1,t do
-		x1=(1-i)*Move[1].x+i*middle.x
-		x2=(1-i)*Move[2].x+i*middle.x
-		y1=(1-i)*Move[1].y+i*middle.y
-		y2=(1-i)*Move[2].y+i*middle.y
-		touch.move(self.index,x1,y1)
-		touch.move(self.index+1,x2,y2)
-		sleep(steptime)
-	end
-	slp(self.holdtime)
-	touch.up(self.index,x1,y1)
-	touch.up(self.index+1,x2,y2)
+	local Move={
+		{x=self.MoveStart.x,y=self.MoveStart.y},
+		{x=self.MoveEnd.x,y=self.MoveEnd.y},
+	}
+	local middle={
+		x=math.abs(self.MoveStart.x-self.MoveEnd.y),
+		y=math.abs(self.MoveStart.y-self.MoveEnd.y),
+	}
+	local t=self.steplen/100
+		touch.down(self.index,Move[1].x,Move[1].y)
+		touch.down(self.index+1,Move[2].x,Move[2].y)
+		for i=0,1,t do
+			x1=(1-i)*Move[1].x+i*middle.x
+			x2=(1-i)*Move[2].x+i*middle.x
+			y1=(1-i)*Move[1].y+i*middle.y
+			y2=(1-i)*Move[2].y+i*middle.y
+				touch.move(self.index,x1,y1)
+				touch.move(self.index+1,x2,y2)
+				sleep(steptime)
+		end
+		slp(self.holdtime)
+		touch.up(self.index,x1,y1)
+		touch.up(self.index+1,x2,y2)
 end
 function Slide:Enlarge()--双指扩大
 local x1,y1,x2,y2
-local Move={
-	{x=self.MoveStart.x,y=self.MoveStart.y},
-	{x=self.MoveEnd.x,y=self.MoveEnd.y},
-}
-local middle={
-	x=math.abs(self.MoveStart.x-self.MoveEnd.y),
-	y=math.abs(self.MoveStart.y-self.MoveEnd.y),
-}
-local t=self.steplen/100
-	touch.down(self.index,middle.x,middle.y)
-	touch.down(self.index+1,middle.x,middle.y)
-	for i=0,1,t do
-		x1=(1-i)*middle.x+i*Move[1].x
-		x2=(1-i)*middle.x+i*Move[2].x
-		y1=(1-i)*middle.y+i*Move[1].y
-		y2=(1-i)*middle.y+i*Move[2].y
+	local Move={
+		{x=self.MoveStart.x,y=self.MoveStart.y},
+		{x=self.MoveEnd.x,y=self.MoveEnd.y},
+	}
+	local middle={
+		x=math.abs(self.MoveStart.x-self.MoveEnd.y),
+		y=math.abs(self.MoveStart.y-self.MoveEnd.y),
+	}
+	local t=self.steplen/100
+		touch.down(self.index,middle.x,middle.y)
+		touch.down(self.index+1,middle.x,middle.y)
+			for i=0,1,t do
+				x1=(1-i)*middle.x+i*Move[1].x
+				x2=(1-i)*middle.x+i*Move[2].x
+				y1=(1-i)*middle.y+i*Move[1].y
+				y2=(1-i)*middle.y+i*Move[2].y
 		touch.move(self.index,x1,y1)
 		touch.move(self.index+1,x2,y2)
 		sleep(steptime)
@@ -915,5 +918,4 @@ end
 function System:getArry()--获取Arry缩放参数
 	return self.Arry
 end
-
 

@@ -26,7 +26,7 @@ function belongvalue(aimTable,aim)--判断目标变量在表中是否存在
 	return false
 end
 
-function belongindex(aimTable,aim)--判断目标变量在表中是否存在
+function belongkey(aimTable,aim)--判断目标变量在表中是否存在
 	for k,_ in pairs(aimTable) do
 		if aim==k then
 			return true

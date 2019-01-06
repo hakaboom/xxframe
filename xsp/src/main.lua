@@ -23,14 +23,8 @@ CurScreen={	--本机分辨率
 	Width=2436,Height=1125,
 }
 _K=System:new(DevScreen,CurScreen,1,"Height","Height")
-screen.init(1)
---需要什么demo就取消哪个的注释
---require'Demo.multiPoint'
+screen.init(3)
 
---require'Demo.File'
+ocr=require'baiduOCR.BaiduOCR'
 
---require'Demo.HUD'
-
---require'Demo.runTime'
-
---require'Demo.Slide'
+Print(ocr.getText(Rect(22,75,73,54)))
