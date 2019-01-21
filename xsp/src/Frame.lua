@@ -34,16 +34,16 @@ _point_metatable={
 function point:new(Base)--创建单点对象
 	local o={
 		_type="point",
-		fuzz=Base.fuzz or 95,--模糊度(选填)
-		index=Base.index or 1,--点击的index(选填)
-		Anchor=Base.Anchor,--锚点(选填)
-		MainPoint=Base.MainPoint,--锚点坐标(选填)
-		DstMainPoint=Base.DstMainPoint,--按照此锚点为基准点进行换算(选填)
+		fuzz =	Base.fuzz or 95,
+		index =	Base.index or 1,
+		Anchor = Base.Anchor,
+		MainPoint =	Base.MainPoint,
+		DstMainPoint = Base.DstMainPoint,
 		Dev={
-			x=Base.x,	--x(必填)
-			y=Base.y,	--y(必填)
-			color=(Base.color and Color3B(Base.color) or nil),--颜色值(选填)
-			offset=(Base.offset and Color3B(Base.offset) or nil),
+			x = Base.x,
+			y =	Base.y,
+			color= Base.color and Color3B(Base.color) or nil,
+			offset= Base.offset and Color3B(Base.offset) or nil,
 		},
 		Cur={
 		},
@@ -65,17 +65,18 @@ function point:new(Base)--创建单点对象
 end
 function point:newByCur(Base)
 	local o={
-		_type="point",
-		fuzz=Base.fuzz or 95,--模糊度(选填)
-		index=Base.index or 1,--点击的index(选填)
-		Anchor=Base.Anchor,--锚点(选填)
-		MainPoint=Base.MainPoint,--锚点坐标(选填)
-		DstMainPoint=Base.DstMainPoint,--按照此锚点为基准点进行换算(选填)
+		_type = "point",
+		fuzz = Base.fuzz or 95,
+		index =	Base.index or 1,
+		Anchor = Base.Anchor,
+		MainPoint = Base.MainPoint,
+		DstMainPoint = Base.DstMainPoint,
+	--	Dev={} --no Dev
 		Cur={
-			x=Base.x,	--x(必填)
-			y=Base.y,	--y(必填)
-			color=(Base.color and Color3B(Base.color) or nil),
-			offset=(Base.offset and Color3B(Base.offset) or nil),
+			x = Base.x,	
+			y = Base.y,	
+			color = Base.color and Color3B(Base.color) or nil,
+			offset = Base.offset and Color3B(Base.offset) or nil,
 		},
 	}
 	o.Arry=Base.Arry or _const.Arry
@@ -84,21 +85,21 @@ function point:newByCur(Base)
 end
 function point:newBymulti(Base)
 	local o={
-		_type="point",
-		fuzz=Base.fuzz or 95,
-		index=Base.index or 1,
-		Anchor=Base.Anchor,
-		MainPoint=Base.MainPoint,
-		DstMainPoint=Base.DstMainPoint,
+		_type = "point",
+		fuzz = Base.fuzz or 95,
+		index = Base.index or 1,
+		Anchor = Base.Anchor,
+		MainPoint = Base.MainPoint,
+		DstMainPoint = Base.DstMainPoint,
 		Dev={
-			x=Base.x,
-			y=Base.y,
-			color=(Base.color and Color3B(Base.color) or nil),
-			offset=(Base.offset and Color3B(Base.offset) or nil),
+			x = Base.x,
+			y = Base.y,
+			color = Base.color and Color3B(Base.color) or nil,
+			offset = Base.offset and Color3B(Base.offset) or nil,
 		},
 		Cur={
-			x=Base.Cur.x,
-			y=Base.Cur.y,
+			x = Base.Cur.x,
+			y = Base.Cur.y,
 		},
 	}
 	o.Arry=Base.Arry or _const.Arry;
@@ -118,8 +119,7 @@ function point:Click(T)	--单点屏幕
 	slp(T)
 end
 function point:getColor()--获取点的颜色R,G,B
-	local color=screen.getColor(self.Cur.x,self.Cur.y)
-	self.Cur.color=color
+	self.Cur.color=screen.getColor(self.Cur.x,self.Cur.y)
 end
 function point:getBilinear()--二次插值取点 
 _K:keep(true)
@@ -155,7 +155,6 @@ local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
 		local ofr,ofg,ofb=offColor.r,offColor.g,offColor.b	--偏色rgb
 		local ar,ag,ab=r-ofr,g-ofg,b-ofb	--max
 		local ir,ig,ib=r+ofr,g+ofg,b+ofb	--min
-	--	Print({["maxs"]={ar,ag,ab},["mins"]={ir,ig,ib},["Cur"]={lr,lg,lb}})
 		if ((ar<lr)and(ag<lg)and(ab<lb)) and  --max< color <min
 			((lr<ir)and(lg<ig)and(lb<ib)) then
 			return true
@@ -240,22 +239,22 @@ _multiPoint_metatable={
 	__index=multiPoint,
 	__tostring=function (multi)
 		return _printmultiPoint_(multi)
-	end
+	end,
 }
 function multiPoint:new(Base)--创建多点对象
 	local o={
-		_type="multiPoint",
-		_tag=Base._tag,
-		fuzz=Base.fuzz or 95,--模糊值(选填)
-		index=Base.index,--点击范围(选填)
-		indexN=Base.indexN or 1,
-		Area=Base.Area,--范围坐标{x1,y1,x2,y2}(findcolor等需要范围坐标的必选)
-		MainPoint=Base.MainPoint,--锚点{x,y}(选填)
-		Anchor=Base.Anchor,--锚点(选填)
-		DstMainPoint=Base.DstMainPoint,--按照此锚点为基准点进行换算(选填)
-		offset=Base.offset,--偏色值(用于二值化 选填)
-		limit=Base.limit,--(多点找色的返回值数量)
-		priority=Base.priority or screen.PRIORITY_DEFAULT,--(找色扫描方向)
+		_type = "multiPoint",
+		_tag = Base._tag,
+		fuzz = Base.fuzz or 95,
+		index = Base.index,
+		indexN = Base.indexN or 1,
+		Area = Base.Area,
+		MainPoint =	Base.MainPoint,
+		Anchor = Base.Anchor,
+		DstMainPoint = Base.DstMainPoint,
+		offset = Base.offset,
+		limit =	Base.limit,
+		priority = Base.priority or screen.PRIORITY_DEFAULT,
 	}
 	o.Arry=Base.Arry or _const.Arry
 	local Arry=o.Arry
@@ -274,7 +273,6 @@ function multiPoint:new(Base)--创建多点对象
 			v.MainPoint=o.MainPoint
 			o[k]=point:newBymulti(v)
 		end)
-		
 	else	
 		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)	--计算锚点
 		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
@@ -282,30 +280,31 @@ function multiPoint:new(Base)--创建多点对象
 			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,o.Arry)
 			o[k]=point:newBymulti(v)
 		end)
-		
 	end
-		o.index=(o.index and getScaleArea(o.index,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
-		o.Area=(o.Area and getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,o.Arry) or nil)
+	
+	o.index=(o.index and getScaleArea(o.index,o.DstMainPoint,o.MainPoint,Arry) or nil)
+	o.Area=(o.Area and getScaleArea(o.Area,o.DstMainPoint,o.MainPoint,Arry) or nil)
 	setmetatable(o,_multiPoint_metatable)
 	return o
 end
 function multiPoint:newBypoint(Base)--由单点对象创建多点对象
 	local o={
-		_type="multiPoint",
-		_tag=Base._tag,
-		fuzz=Base.fuzz or 95,--模糊值(选填)
-		index=Base.index,--点击范围(选填)
-		indexN=Base.indexN or 1,
-		Area=Base.Area,--范围坐标{x1,y1,x2,y2}(findcolor等需要范围坐标的必选)
-		MainPoint=Base.MainPoint ,--锚点{x,y}(选填)
-		Anchor=Base.Anchor,--锚点(选填)
-		DstMainPoint=Base.DstMainPoint,--按照此锚点为基准点进行换算(选填)
-		offset=Base.offset,--偏色值(用于二值化 选填)
-		priority=Base.priority or screen.PRIORITY_DEFAULT,
+		_type =	"multiPoint",
+		_tag = Base._tag,
+		fuzz = Base.fuzz or 95,
+		index = Base.index,
+		indexN = Base.indexN or 1,
+		Area = Base.Area,
+		MainPoint = Base.MainPoint ,
+		Anchor = Base.Anchor,
+		DstMainPoint = Base.DstMainPoint,
+		offset = Base.offset,
+		limit = Base.limit,
+		priority = Base.priority or screen.PRIORITY_DEFAULT,
 	}
 	o.Arry=Base.Arry or _const.Arry
 	------------------------------------------------------------------------------
-		table.foreachi(Base,function(k,v) o[k]=v end)
+	table.foreachi(Base,function(k,v) o[k]=v end)
 	setmetatable(o,_multiPoint_metatable)
 	return o
 end
@@ -346,13 +345,12 @@ function multiPoint:getBilinear()
 		end
 end
 function multiPoint:cmpColor()--比色 可以在这里取消注释进行测试时候的判断
-	local floor=math.floor
- 		for k,v in ipairs(self) do
-			local  res=v:cmpColor()
-				if not res then
-					local err=_printcmpColorErr_(v.Cur.color,v.Dev.color,self._tag,k)
-				return false,err
-			end
+	for k,v in ipairs(self) do
+		local  res=v:cmpColor()
+			if not res then
+				local err=_printcmpColorErr_(v.Cur.color,v.Dev.color,self._tag,k)
+			return false,err
+		end
   	end
 		printf(">>>>>>>>>>>>>>>>%s:true",(self._tag or ""))
   	return true
@@ -377,7 +375,6 @@ function multiPoint:findColor(returnType)--区域找色
 				offset=v.Dev.offset,
 				} 
 		end)
-	--Print(color)
 	local pos=screen.findColor(self.Area,color,self.fuzz,self.priority)
 		if pos ~= Point.INVALID then
 			if returnType=="getXY" then
@@ -443,13 +440,13 @@ function multiPoint:findColorEX(Ac,fuzz)--用多点找色返回的点去取比�
 		end
 end
 function multiPoint:binarizeImage()--二值化图片
-assert(self.Area, "binarizeImage没有传入Area")
+	assert(self.Area, "binarizeImage没有传入Area")
 	local img = Image.fromScreen(self.Area)
 	local data = img:binarize(self.offset)
 	self.binarize=data
 end
 function multiPoint:getText(data)--识字
-assert(self.Area, "findColors没有传入Area")
+	assert(self.Area, "findColors没有传入Area")
 	if not self.binarize then self:binarizeImage() end
 	local ocr=OCR:new({lang="eng"})
 	data.binarize=self.binarize
@@ -471,11 +468,14 @@ function multiPoint:getAllpoint()
 	table.foreachi(self,function (k,v) tbl[k]=v end)
 	return tbl	
 end
+function multiPoint:getArea()
+	return self.Area
+end
 function multiPoint:showHUD(T)
-local hud=HUD:new({Area=self.Area})
-hud:show()
-slp(T)
-hud:clear()
+	local hud=HUD:new({Area=self.Area})
+		hud:show()
+		slp(T)
+		hud:clear()
 end
 function multiPoint:offsetXY(x,y,offsetMode)--偏移坐标
 	table.foreachi(self, function(k,v) 
@@ -483,13 +483,13 @@ function multiPoint:offsetXY(x,y,offsetMode)--偏移坐标
 	end)
 end
 function multiPoint:printbinarize()--打印二值化data
-local data=self.binarize
+	local data=self.binarize
 	for _,v in pairs(data) do
 		print(table.concat(v, ''))
 	end
 end
 function multiPoint:printXY()--打印所有的点参数
-print(string.format(">>>>>>>>>>>>>>>>%s",(self._tag or "")))
+	print(string.format(">>>>>>>>>>>>>>>>%s",(self._tag or "")))
 	table.foreachi(self, function(k,v) 
 		self[k]:printXY()
 	end)
@@ -504,14 +504,14 @@ HUD={
 }
 function HUD:new(Base)--创建HUD
 	local o={
-		origin=nil,
-		size=nil,
-		color=Base.color or "0xffffffff",
-		bg=Base.bg or "0xffffffff",
-		textsize=(Base.textsize or 20)*_const.Arry.AppurtenantScaleMode,
-		id=createHUD(),
-		pos=Base.pos or 0,
-		text=Base.text or "",
+		origin = nil,
+		size = nil,
+		color = Base.color or "0xffffffff",
+		bg = Base.bg or "0xffffffff",
+		textsize = (Base.textsize or 20)*_const.Arry.AppurtenantScaleMode,
+		id = createHUD(),
+		pos = Base.pos or 0,
+		text = Base.text or "",
 	}
 	if Base.point then 
 		o.origin=Base.point[1]
@@ -524,11 +524,11 @@ function HUD:new(Base)--创建HUD
 	return o
 end
 function HUD:show(text)
-local o=self:getdata(text)
+	local o=self:getdata(text)
 	showHUD(self.id,o.text,o.size,o.color,o.bg,o.pos,o.x,o.y,o.width,o.height)
 end
 function HUD:hide()
-local o=self:getdata()
+	local o=self:getdata()
 	showHUD(self.id,"",o.size,"0x00000000","0x00000000",o.pos,o.x,o.y,o.width,o.height)
 end
 function HUD:clear()
@@ -666,15 +666,15 @@ function OCR:new(data)--{Edition="tessocr_3.02.02",path="res/",lang="chi_sim"}
 		Edition=data.Edition or "tessocr_3.05.02",
 		path=data.path or "[external]",
 		lang=data.lang or "eng",
-		PSM=6,
+		PSM=data.PSM or 6,
 		White="",
 		Black="",
 		reset=false,
 	}
 	local tessocr=require(o.Edition)	
 	local ocr,msg=tessocr.create({
-		path=o.path,
-		lang=o.lang,
+		path = o.path,
+		lang = o.lang,
 	})
 	if ocr==nil then
 		print("ocr创建失败:"..msg)
@@ -725,22 +725,22 @@ end
 Slide={
 }
 function Slide:new(Base)
-local o={
-	MoveStart=Base.point[1],			--起始点
-	MoveEnd=Base.point[2],				--结束点
-	holdtime=Base.holdtime or 0,	--滑动结束后touchup前的延迟,可以防止滑动的惯性效果
-	steplen=Base.steplen or 10,		--步长
-	steptime=Base.steptime or 10,	--每次滑动后的延迟
-	index=Base.index or 1,
-}
+	local o={
+		MoveStart=Base.point[1],			--起始点
+		MoveEnd=Base.point[2],				--结束点
+		holdtime=Base.holdtime or 0,	--滑动结束后touchup前的延迟,可以防止滑动的惯性效果
+		steplen=Base.steplen or 10,		--步长
+		steptime=Base.steptime or 10,	--每次滑动后的延迟
+		index=Base.index or 1,
+	}
 	setmetatable(o,{__index = self})
 	return o
 end
 function Slide:move()--双指移动
-local x,y
-local x1,y1=self.MoveStart.x,self.MoveStart.y
-local x2,y2=self.MoveEnd.x,self.MoveEnd.y
-local t=self.steplen/100
+	local x,y
+	local x1,y1=self.MoveStart.x,self.MoveStart.y
+	local x2,y2=self.MoveEnd.x,self.MoveEnd.y
+	local t=self.steplen/100
 	touch.down(self.index,x1,y1)
 	for i=0,1,t do
 		x=(1-i)*x1+i*x2
@@ -757,7 +757,7 @@ local t=self.steplen/100
 	touch.up(self.index,x,y)
 end
 function Slide:Close()--双指缩小
-local x1,y1,x2,y2
+	local x1,y1,x2,y2
 	local Move={
 		{x=self.MoveStart.x,y=self.MoveStart.y},
 		{x=self.MoveEnd.x,y=self.MoveEnd.y},
@@ -783,7 +783,7 @@ local x1,y1,x2,y2
 		touch.up(self.index+1,x2,y2)
 end
 function Slide:Enlarge()--双指扩大
-local x1,y1,x2,y2
+	local x1,y1,x2,y2
 	local Move={
 		{x=self.MoveStart.x,y=self.MoveStart.y},
 		{x=self.MoveEnd.x,y=self.MoveEnd.y},
@@ -815,9 +815,6 @@ end
 System={ --
 }
 function System:new(DevScreen,CurScreen,initfor,MainPointsScaleMode,AppurtenantScaleMode,GameAspect)
---Dev(开发机布局),Cur(客户机布局) width>height
---MainPointsScaleMode为对象中锚点的缩放方式,AppurtenantScaleMode为多点对象中从属点的缩放方式
---GameAspect为游戏的比例
 	local o={
 		Dev=DevScreen,
 		Cur=CurScreen,
@@ -898,8 +895,8 @@ function System:addSystemData(key,value)
 	self.SystemData[key] = value
 end
 function System:getSystemData()--一些系统的属性,按照需求自己添加
-local UserInfo,code = script.getUserInfo()
-local ScriptInfo, code = script.getScriptInfo()
+	local UserInfo,code = script.getUserInfo()
+	local ScriptInfo, code = script.getScriptInfo()
 	local data={
 		ver=xmod.PLATFORM,
 		dpi=screen.getDPI(),

@@ -8,7 +8,7 @@ end
 --	lua 5.3手册	  	 https://cloudwu.github.io/lua53doc/contents.html
 --	GitHub		   	 https://github.com/hakaboom/xxframe 
 --把自定义取色放到叉叉集成开发环境下的data.lua,可以直接覆盖,抓图的时候用Anchor
---打印函数为Print()没有覆盖print()
+--打印函数为Print()
 --初始化必须调用
 --	K=System:new(DevScreen,CurScreen,1,"Height","Height")
 --	需要自己调用screen.init
@@ -22,9 +22,26 @@ CurScreen={	--本机分辨率
 	Top=0,Bottom=0,Left=93,Right=93,
 	Width=2436,Height=1125,
 }
-_K=System:new(DevScreen,CurScreen,1,"Height","Height")
-screen.init(3)
+_K=System:new(DevScreen,DevScreen,1,"Height","Height")
 
-ocr=require'baiduOCR.BaiduOCR'
+_K:keep(true)
 
-Print(ocr.getText(Rect(22,75,73,54)))
+rect=Rect(1,1,1,1)
+local v = {
+	{pos=Point(100,200),color=0xffffff},
+	{pos=Point(200,200),color=0xffffff},
+	{pos=Point(100,300),color=0xffffff},
+	{pos=Point(500,200),color=0xffffff}
+}
+nowTime=os.milliTime()
+for i = 1, 20000 do
+	local x = screen.findColor(rect,v,100)
+end
+print((os.milliTime()-nowTime).."ms")
+print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+nowTime=os.milliTime()
+for i=1,20000 do
+	screen.matchColors(v)
+end
+print((os.milliTime()-nowTime).."ms")
