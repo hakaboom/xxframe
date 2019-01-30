@@ -31,7 +31,7 @@ _const={
 		end,
 		["Top"] = function (point,Arry)--上中 
 			local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-			local y=MainPoint.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+			local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
 			return x,y
 		end,
 		["Bottom"] = function (point,Arry)--下中

@@ -148,8 +148,8 @@ local point=self.Cur
 		self.Cur.color=Color3B(DstColor.r,DstColor.g,DstColor.b)
 end
 function point:cmpColor()--比色
-local r ,g ,b =self.Dev.color.r,self.Dev.color.g,self.Dev.color.b	
-local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
+	local r ,g ,b =self.Dev.color.r,self.Dev.color.g,self.Dev.color.b	
+	local lr,lg,lb=self.Cur.color.r,self.Cur.color.g,self.Cur.color.b
 	if self.Dev.offset then
 		local offColor=self.Dev.offset
 		local ofr,ofg,ofb=offColor.r,offColor.g,offColor.b	--偏色rgb
@@ -618,6 +618,15 @@ function File:WriteNewByJson(tbl)--以Json格式写入文件tbl={["xxxxx"]="123"
 	file:write(str)
 	file:flush()
 	file:close()
+end
+function File:ReadFile()--直接读取文件全部内容,返回字符串
+	local json=require("cjson")
+	local file=io.open(self.Path,"r")
+	assert(file,"path of the file don't exist or can't open")
+	local str=file:read("*all")
+	file:flush()
+	file:close()
+	return str
 end
 function File:ReadByJson()--读取Json格式的文件
 	local json=require("cjson")

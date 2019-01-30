@@ -78,7 +78,7 @@ function getTblLen(tbl)--获取表长度
 	return len
 end
 
-function split(str,pattern,content)--字符串分割
+function split(str,pattern,content)	--字符串分割
 	if str==nil or str=='' or pattern==nil then
 		return {}
 	end
@@ -210,7 +210,7 @@ function Print(...)
 				elseif _type=="boolean" then
 					tbl[#tbl+1]=format("%s[%s](bool) = %s",_Space,tostring(k),(v and "true" or "false"))
 				elseif _type=="string" then
-					tbl[#tbl+1]=format("%s[%s](str) = %s",_Space,tostring(k),(t=="" and "empty_s"  or t))
+					tbl[#tbl+1]=format("%s[%s](str) = %s",_Space,tostring(k),(v=="" and "empty_s"  or v))
 				else
 					tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),string.sub(_type,1,3),v)
 				end

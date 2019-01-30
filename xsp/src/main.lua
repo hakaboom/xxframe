@@ -19,29 +19,7 @@ DevScreen={	--开发分辨率
 	Width=1920,Height=1080,
 }
 CurScreen={	--本机分辨率
-	Top=0,Bottom=0,Left=93,Right=93,
-	Width=2436,Height=1125,
+	Top=0,Bottom=0,Left=0,Right=0,
+	Width=1280,Height=720,
 }
-_K=System:new(DevScreen,DevScreen,1,"Height","Height")
-
-_K:keep(true)
-
-rect=Rect(1,1,1,1)
-local v = {
-	{pos=Point(100,200),color=0xffffff},
-	{pos=Point(200,200),color=0xffffff},
-	{pos=Point(100,300),color=0xffffff},
-	{pos=Point(500,200),color=0xffffff}
-}
-nowTime=os.milliTime()
-for i = 1, 20000 do
-	local x = screen.findColor(rect,v,100)
-end
-print((os.milliTime()-nowTime).."ms")
-print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
-nowTime=os.milliTime()
-for i=1,20000 do
-	screen.matchColors(v)
-end
-print((os.milliTime()-nowTime).."ms")
+_K=System:new(DevScreen,CurScreen,1,"Height","Height")
