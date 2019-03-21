@@ -1,6 +1,7 @@
 if not rawget(_G, 'xmod') then
 	error("the 'xmod' not find")
 end
+-- xmod > v2.0.249
 -- 交流群qq:952589499
 -- v1.3.17
 --  框架手册			 https://www.zybuluo.com/hakaboom/note/1370480

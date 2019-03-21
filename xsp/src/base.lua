@@ -108,40 +108,22 @@ function string.trim(s)
 	return s:match'^%s*(.*%S)'  or ''
 end
 
-function screenPoint(Table,n)
-	local abs=math.abs
-	local sqrt=math.sqrt
-	local new = {}
-	for i = 1, #Table do
-		new[i] = {}
-		for k = 1, #Table do
-			if k ~= i then
-				if abs(Table[k].x-Table[i].x)<=n and abs(Table[k].y-Table[i].y)<=n then
-					new[i][#new[i]+1] = k
-				end
-			end
+function keyPairs(tbl,fun)	--返回一个迭代器,并且会按照key排序,fun同理table.sort的传参
+	local ary = {}
+	for k in pairs(tbl) do
+		ary[#ary+1] = k
+	end
+	table.sort(ary,fun)
+	local i = 0
+	local iter = function ()
+		i = i+1
+		if ary[i] == nil then
+			return nil
+		else
+			return ary[i],tbl[ary[i]]
 		end
 	end
-	local length = {}
-	for i = 1, #new do
-		length[i] = {length=#new[i],key=i}
-	end
-	table.sort(length,function(a,b) return a.length>b.length end)
-	for i = 1, #length do
-		local key = length[i].key
-		if new[key] then
-			for k = 1, #new[key] do
-				new[new[key][k]] = false
-			end
-		end
-	end
-	local retPoint = {}
-	for i = 1, #new do
-		if new[i] then
-			retPoint[#retPoint+1] = Table[i]
-		end
-	end
-	return retPoint
+	return iter
 end
 
 function getScaleMainPoint(MainPoint,Anchor,Arry)	--缩放锚点
@@ -162,15 +144,45 @@ function getScaleXY(point,MainPoint,DstMainPoint,Arry)	--缩放XY
 end
 
 function getScaleArea(Area,DstMainPoint,MainPoint,Arry)	--缩放Area
+	local Area = Area
+	local __type = type(Area)	
+	if (__type == 'table') then
+		local _len = #Area
+		if (_len == 1) then	--Area={Rect()}
+			if Area[1].__tag == 'Rect' then
+				local rect = Area[1]
+				Area = {rect.x,rect.y,rect.x+rect.width,rect.y+rect.height}
+			else
+				error('传参错误')
+			end
+		elseif (_len == 2) then --Area = {100,100}
+		--	Area = Area
+		elseif (_len == 4) then --Area = {x1,y1,x2,y2}
+			if Area[3]>Area[1] and Area[4]>Area[2] then 
+		--		Area = Area
+			elseif Area[3]<Area[1] or  Area[2]<Area[4] then 	--Area = {x1,y1,width,height}
+				Area = {Area[1],Area[2],Area[1]+Area[3],Area[2]+Area[4]}
+			else
+				error('传参错误')
+			end
+		end
+	elseif (__type) == 'userdata' then	
+		if Area.__tag == 'Rect' then	--Area=Rect()
+			Area = {Area.x,Area.y,Area.x+Area.width,Area.y+Area.height}		
+		end
+	else
+		error('传参错误')
+	end
+
 	if DstMainPoint then
-		if #Area==2 then return
-			{getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)} end
+		if #Area==2 then return 
+		{getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)} end
 		Area[1],Area[2]=getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)
 		Area[3],Area[4]=getScaleXY({x=Area[3],y=Area[4]},MainPoint,DstMainPoint,Arry)
 	else
 		if #Area==2 then return
 			{(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left,
-				(Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top}
+			 (Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top}
 		end
 		Area[1]=(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
 		Area[3]=(Area[3]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
@@ -179,7 +191,8 @@ function getScaleArea(Area,DstMainPoint,MainPoint,Arry)	--缩放Area
 	end
 	local width=Area[3]-Area[1]
 	local height=Area[4]-Area[2]
-	return  Rect(Area[1],Area[2],width,height)
+
+	return Rect(Area[1],Area[2],width,height)
 end
 
 function _SpaceNumRep(SpaceNum,Num)
@@ -201,19 +214,19 @@ function Print(...)
 		for k,v in pairs(t) do
 			local _type=type(v)
 			local _Space=_SpaceNumRep(SpaceNum,Num)
-				if _type=="table" and (v._type=="point" or v._type=="multiPoint") then
-					tbl[#tbl+1]=format("%s[%s] = %s",_Space,tostring(k),(_printcustomData_(v._type))(v,_SpaceNumRep(SpaceNum,Num+1)))
-				elseif _type=="table" and k~="_G" and(not v.package) then
-					tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s }",_Space,tostring(k),printTable(v,Num),_SpaceNumRep(SpaceNum,Num))
-				elseif _type=="table" and (v.package) then
-					tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),_type,v)
-				elseif _type=="boolean" then
-					tbl[#tbl+1]=format("%s[%s](bool) = %s",_Space,tostring(k),(v and "true" or "false"))
-				elseif _type=="string" then
-					tbl[#tbl+1]=format("%s[%s](str) = %s",_Space,tostring(k),(v=="" and "empty_s"  or v))
-				else
-					tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),string.sub(_type,1,3),v)
-				end
+			if _type=="table" and (v._type=="point" or v._type=="multiPoint") then
+				tbl[#tbl+1]=format("%s[%s] = %s",_Space,tostring(k),(_printcustomData_(v._type))(v,_SpaceNumRep(SpaceNum,Num+1)))
+			elseif _type=="table" and k~="_G" and(not v.package) then
+				tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s }",_Space,tostring(k),printTable(v,Num),_SpaceNumRep(SpaceNum,Num))
+			elseif _type=="table" and (v.package) then
+				tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),_type,v)
+			elseif _type=="boolean" then
+				tbl[#tbl+1]=format("%s[%s](bool) = %s",_Space,tostring(k),(v and "true" or "false"))
+			elseif _type=="string" then
+				tbl[#tbl+1]=format("%s[%s](str) = %s",_Space,tostring(k),(v=="" and "empty_s"  or v))
+			else
+				tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),string.sub(_type,1,3),v)
+			end
 			tbl[#tbl+1]="\n"
 		end
 		return table.concat(tbl)
@@ -225,7 +238,7 @@ function Print(...)
 			if (t._type=="point" or t._type=="multiPoint") then
 				tbl[#tbl+1]=format("%s",(_printcustomData_(t._type))(t))
 			else
-				tbl[#tbl+1]=format("\n Table = { \n %s }",printTable(t,Num)) 
+				tbl[#tbl+1]=format("\n Table = { \n %s }",printTable(t,Num))
 			end
 		elseif _type=="string" then
 			tbl[#tbl+1]=format("%s",(t=="" and "empty_s"  or t))

@@ -122,14 +122,14 @@ function point:getColor()--获取点的颜色R,G,B
 	self.Cur.color=screen.getColor(self.Cur.x,self.Cur.y)
 end
 function point:getBilinear()--二次插值取点 
-_K:keep(true)
-local point=self.Cur
+	_K:keep(true)
+	local point=self.Cur
 	local ZoomX,ZoomY=math.floor(point.x),math.floor(point.y)	--缩放后的临近点
 	local u,v=(point.x-ZoomX),(point.y-ZoomY)
-		local r0,g0,b0=screen.getRGB(ZoomX,ZoomY)
-		local r1,g1,b1=screen.getRGB(ZoomX+1,ZoomY)
-		local r2,g2,b2=screen.getRGB(ZoomX,ZoomY+1)
-		local r3,g3,b3=screen.getRGB(ZoomX+1,ZoomY+1)
+		local r0,g0,b0=screen.getColorRGB(ZoomX,ZoomY)
+		local r1,g1,b1=screen.getColorRGB(ZoomX+1,ZoomY)
+		local r2,g2,b2=screen.getColorRGB(ZoomX,ZoomY+1)
+		local r3,g3,b3=screen.getColorRGB(ZoomX+1,ZoomY+1)
 		local	tmpColor0={
 					r=(r0*(1-u)+r1*u),
 					g=(g0*(1-u)+g1*u),
@@ -191,7 +191,7 @@ function point:getXYtoPoint()
 end
 function point:ClearText()
 	self:Click(1)
-	runtime.inputText("CLEAR")
+	runtime.inputText("#CLEAR#")
 end
 function point:inputText(Text)
 	self:Click(1)
@@ -888,7 +888,7 @@ function System:new(DevScreen,CurScreen,initfor,MainPointsScaleMode,AppurtenantS
 	return o
 end
 function System:keep(boole,T)--和scren.keep()一样
-	if boole then if self.KeepScreen then return end end
+	if boole and self.KeepScreen then return end
 	slp(T or self.keepTime)	
 	screen.keep(boole)
 	self.KeepScreen=boole
