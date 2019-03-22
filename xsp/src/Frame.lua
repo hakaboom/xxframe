@@ -216,11 +216,11 @@ local Arry=o.Arry
 end
 function point:offsetXY(x,y,offsetMode)--偏移坐标
 	if offsetMode=="withArry" then
-		pointx=self.Cur.x-(x*self.Arry.AppurtenantScaleMode)
-		pointy=self.Cur.y-(y*self.Arry.AppurtenantScaleMode)
+		pointx=self.Cur.x+(x*self.Arry.AppurtenantScaleMode)
+		pointy=self.Cur.y+(y*self.Arry.AppurtenantScaleMode)
 	else
-		pointx=self.Cur.x-x
-		pointy=self.Cur.y-y		
+		pointx=self.Cur.x+x
+		pointy=self.Cur.y+y		
 	end
 	self.Cur.x=pointx
 	self.Cur.y=pointy
