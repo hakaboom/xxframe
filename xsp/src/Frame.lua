@@ -705,9 +705,12 @@ function OCR:new(data)--{Edition="tessocr_3.02.02",path="res/",lang="chi_sim"}
 	return o
 end
 function OCR:getText(data)--{rect={},diff={},PSM=6,white="123456789"}
-	if data.binarize then Data=data.binarize else --二值化图片
+	local Data
+	if data.binarize then 
+		Data=data.binarize 
+	else --二值化图片
 		local img=Image.fromScreen(data.Rect)
-		local Data=img:binarize(data.diff)	
+		Data=img:binarize(data.diff)	
 	end
 	local PSM=data.PSM or self.PSM
 	local White=data.white or self.White
@@ -719,7 +722,7 @@ function OCR:getText(data)--{rect={},diff={},PSM=6,white="123456789"}
 		if code == 0 then
 			local text=result:trim()
 			 printf('text = %s', text)
-			 return text
+			 return text,detail
 		else
 			print('ocr:getText failed!')
 		end
