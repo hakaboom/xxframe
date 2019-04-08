@@ -14,7 +14,7 @@ end
 --	K=System:new(DevScreen,CurScreen,1,"Height","Height")
 --	需要自己调用screen.init
 
-require"base"require'Frame'require'const' --必须要的前置代码
+require'base'require'Frame' --必须要的前置代码
 DevScreen={	--开发分辨率
 	Top=0,Bottom=0,Left=0,Right=0,
 	Width=1920,Height=1080,

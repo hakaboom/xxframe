@@ -1,3 +1,165 @@
+_const={
+	Middle = "Middle",	--居中
+	Left = "Left",	--左
+	Right = "Right",--右
+	Top = "Top",	--上
+	Bottom = "Bottom",	--下
+	LeftTop = "LeftTop",	--左上
+	LeftBottom = "LeftBottom",	--左下
+	RightTop = "RightTop",	--右上
+	RightBottom ="RightBottom",	--右下	
+	getXY = "GetXY",
+	FilePath = "private",
+	offsetMode = "withArry",
+	GetColorMode = "getColor", --"getBilinear" "getColor"
+	Arry=nil,
+}
+
+local setmetatable,foreachi = setmetatable,table.foreachi
+local Color3B = Color3B
+local MainPointScale = {
+	["Middle"] = function(point,Arry)
+		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			return x,y
+	end,
+	["Left"] = function (point,Arry)--左中
+		local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
+		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			return x,y
+	end,
+	["Right"] = function (point,Arry)--右中
+		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			return x,y
+	end,
+	["Top"] = function (point,Arry)--上中 
+		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+		local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+			return x,y
+	end,
+	["Bottom"] = function (point,Arry)--下中
+		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			return x,y
+	end,
+	["LeftTop"] = function (point,Arry)--左上
+		local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
+		local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+			return x,y
+	end,
+	["LeftBottom"] = function (point,Arry)--左下
+		local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
+		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			return x,y
+	end,
+	["RightTop"] = function (point,Arry) --右上角
+		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+		local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+			return x,y
+	end,
+	["RightBottom"] = function (point,Arry) --右下角
+		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
+		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+			return x,y
+	end,
+}
+local getScaleMainPoint = function (MainPoint,Anchor,Arry)	--缩放锚点
+	local point={
+		x=MainPoint.x-Arry.Dev.Left,
+		y=MainPoint.y-Arry.Dev.Top,
+	}
+	local x,y,fun
+	fun=MainPointScale[Anchor]
+	x,y=fun(point,Arry)
+	return {x=x,y=y}
+end
+local getScaleXY        = function (point,MainPoint,DstMainPoint,Arry)	--缩放XY
+	local x=DstMainPoint.x+(point.x-MainPoint.x)*Arry.AppurtenantScaleMode
+	local y=DstMainPoint.y+(point.y-MainPoint.y)*Arry.AppurtenantScaleMode
+	return x,y
+end
+local getScaleArea      = function (Area,DstMainPoint,MainPoint,Arry)	--缩放Area
+	local Area = Area
+	local __type = type(Area)	
+	if (__type == 'table') then
+		local _len = #Area
+		if (_len == 1) then	--Area={Rect()}
+			if Area[1].__tag == 'Rect' then
+				local rect = Area[1]
+				Area = {rect.x,rect.y,rect.x+rect.width,rect.y+rect.height}
+			else
+				error('传参错误')
+			end
+		elseif (_len == 2) then --Area = {100,100}
+		--	Area = Area
+		elseif (_len == 4) then --Area = {x1,y1,x2,y2}
+			if Area[3]>Area[1] and Area[4]>Area[2] then 
+		--		Area = Area
+			elseif Area[3]<Area[1] or  Area[2]<Area[4] then 	--Area = {x1,y1,width,height}
+				Area = {Area[1],Area[2],Area[1]+Area[3],Area[2]+Area[4]}
+			else
+				error('传参错误')
+			end
+		end
+	elseif (__type) == 'userdata' then	
+		if Area.__tag == 'Rect' then	--Area=Rect()
+			Area = {Area.x,Area.y,Area.x+Area.width,Area.y+Area.height}		
+		end
+	else
+		error('传参错误')
+	end
+
+	if DstMainPoint then
+		if #Area==2 then return 
+		{getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)} end
+		Area[1],Area[2]=getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)
+		Area[3],Area[4]=getScaleXY({x=Area[3],y=Area[4]},MainPoint,DstMainPoint,Arry)
+	else
+		if #Area==2 then return
+			{(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left,
+			 (Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top}
+		end
+		Area[1]=(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
+		Area[3]=(Area[3]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
+		Area[2]=(Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
+		Area[4]=(Area[4]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
+	end
+	local width=Area[3]-Area[1]
+	local height=Area[4]-Area[2]
+
+	return Rect(Area[1],Area[2],width,height)
+end
+
+_printcmpColorErr_ = function (Cur,Dev,tag,key) 
+	tag=tag or "" 
+	return  
+end
+_printPoint_       = function (p)
+	return string.format("point<x=%.2f,y=%.2f>",p.Cur.x,p.Cur.y)
+end
+_printmultiPoint_  = function (multi,Num)
+	Num=Num or ""
+	local str="multiPoint< \n"
+		for k,v in ipairs(multi) do
+			str=str..string.format("%s[x=%.2f,y=%.2f]>\n",
+			Num,v.Cur.x,v.Cur.y)
+		end
+		if multi.Area then str=str..string.format("Area=%s%s\n",Num,multi.Area) end
+		if multi.index then str = str .. (multi.index.__tag=='Rect' and 
+			string.format("%sindex=<%s>",Num,multi.index) or string.format('%sindex=Point(%.2f, %.2f)',Num,multi.index[1],multi.index[2])
+		) end
+		str=str..">"
+	return str
+end
+_printcustomData_  = function (_type)
+	if _type=="point" then
+		return _printPoint_
+	elseif _type=="multiPoint" then
+		return _printmultiPoint_ 
+	end
+end
+
 
 point={--单点对象
 }
@@ -260,13 +422,13 @@ function multiPoint:new(Base)--创建多点对象
 	local Arry=o.Arry
 	------------------------------------------------------------------------------
 	if o.DstMainPoint then	
-		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
+		foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
 			v.fuzz=o.fuzz
 			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,Arry)
 			o[k]=point:newBymulti(v)	--缩放
 		end)
 	elseif not o.Anchor then 
-		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
+		foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
 			v.fuzz=o.fuzz
 			v.Cur.x=(v.x-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
 			v.Cur.y=(v.y-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
@@ -275,7 +437,7 @@ function multiPoint:new(Base)--创建多点对象
 		end)
 	else	
 		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)	--计算锚点
-		table.foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
+		foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
 			v.fuzz=o.fuzz
 			v.Cur.x,v.Cur.y=getScaleXY(v,o.MainPoint,o.DstMainPoint,o.Arry)
 			o[k]=point:newBymulti(v)
@@ -682,17 +844,19 @@ end
 OCR={
 }
 function OCR:new(data)--{Edition="tessocr_3.02.02",path="res/",lang="chi_sim"}
+	local data = data or {}
 	local o={
 		Edition=data.Edition or "tessocr_3.05.02",
 		path=data.path or "[external]",
 		lang=data.lang or "eng",
 		PSM=data.PSM or 6,
-		White="",
-		Black="",
+		white=data.white or "",
+		black=data.black or "",
 		reset=false,
 	}
 	local tessocr=require(o.Edition)	
 	local ocr,msg=tessocr.create({
+		mode = 2,
 		path = o.path,
 		lang = o.lang,
 	})
@@ -705,21 +869,26 @@ function OCR:new(data)--{Edition="tessocr_3.02.02",path="res/",lang="chi_sim"}
 	return o
 end
 function OCR:getText(data)--{rect={},diff={},PSM=6,white="123456789"}
-	if data.binarize then Data=data.binarize else --二值化图片
+	local Data
+	if data.binarize then
+		Data=data.binarize 
+	else --二值化图片
 		local img=Image.fromScreen(data.Rect)
-		local Data=img:binarize(data.diff)	
+		Data=img:binarize(data.diff)	
 	end
 	local PSM=data.PSM or self.PSM
-	local White=data.white or self.White
-	local Black=data.Black or self.Black
+	local White=data.white or self.white
+	local Black=data.Black or self.black
+	
 	self.ocr:setPSM(PSM)--设置PSM
 	self.ocr:setWhitelist(White)--设置白名单	
 	self.ocr:setBlacklist(Black)
+
 	local code,result,detail=self.ocr:getText(Data)
 		if code == 0 then
 			local text=result:trim()
 			 printf('text = %s', text)
-			 return text
+			 return text,detail
 		else
 			print('ocr:getText failed!')
 		end

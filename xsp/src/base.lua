@@ -126,75 +126,6 @@ function keyPairs(tbl,fun)	--返回一个迭代器,并且会按照key排序,fun�
 	return iter
 end
 
-function getScaleMainPoint(MainPoint,Anchor,Arry)	--缩放锚点
-	local point={
-		x=MainPoint.x-Arry.Dev.Left,
-		y=MainPoint.y-Arry.Dev.Top,
-	}
-	local x,y,fun
-	fun=_const.MainPointScale[Anchor]
-	x,y=fun(point,Arry)
-	return {x=x,y=y}
-end
-
-function getScaleXY(point,MainPoint,DstMainPoint,Arry)	--缩放XY
-	local x=DstMainPoint.x+(point.x-MainPoint.x)*Arry.AppurtenantScaleMode
-	local y=DstMainPoint.y+(point.y-MainPoint.y)*Arry.AppurtenantScaleMode
-	return x,y
-end
-
-function getScaleArea(Area,DstMainPoint,MainPoint,Arry)	--缩放Area
-	local Area = Area
-	local __type = type(Area)	
-	if (__type == 'table') then
-		local _len = #Area
-		if (_len == 1) then	--Area={Rect()}
-			if Area[1].__tag == 'Rect' then
-				local rect = Area[1]
-				Area = {rect.x,rect.y,rect.x+rect.width,rect.y+rect.height}
-			else
-				error('传参错误')
-			end
-		elseif (_len == 2) then --Area = {100,100}
-		--	Area = Area
-		elseif (_len == 4) then --Area = {x1,y1,x2,y2}
-			if Area[3]>Area[1] and Area[4]>Area[2] then 
-		--		Area = Area
-			elseif Area[3]<Area[1] or  Area[2]<Area[4] then 	--Area = {x1,y1,width,height}
-				Area = {Area[1],Area[2],Area[1]+Area[3],Area[2]+Area[4]}
-			else
-				error('传参错误')
-			end
-		end
-	elseif (__type) == 'userdata' then	
-		if Area.__tag == 'Rect' then	--Area=Rect()
-			Area = {Area.x,Area.y,Area.x+Area.width,Area.y+Area.height}		
-		end
-	else
-		error('传参错误')
-	end
-
-	if DstMainPoint then
-		if #Area==2 then return 
-		{getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)} end
-		Area[1],Area[2]=getScaleXY({x=Area[1],y=Area[2]},MainPoint,DstMainPoint,Arry)
-		Area[3],Area[4]=getScaleXY({x=Area[3],y=Area[4]},MainPoint,DstMainPoint,Arry)
-	else
-		if #Area==2 then return
-			{(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left,
-			 (Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top}
-		end
-		Area[1]=(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
-		Area[3]=(Area[3]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
-		Area[2]=(Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
-		Area[4]=(Area[4]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
-	end
-	local width=Area[3]-Area[1]
-	local height=Area[4]-Area[2]
-
-	return Rect(Area[1],Area[2],width,height)
-end
-
 function _SpaceNumRep(SpaceNum,Num)
 	if SpaceNum[Num] then
 		return SpaceNum[Num]
@@ -202,6 +133,19 @@ function _SpaceNumRep(SpaceNum,Num)
 	return Num == 0 and '' or string.rep('\t',Num)
 end
 
+local _GetSpaceNum = {
+		"\t",
+		"\t\t",
+		"\t\t\t",
+		"\t\t\t\t",
+		"\t\t\t\t\t",
+		"\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t\t\t\t",
+		"\t\t\t\t\t\t\t\t\t\t\t",
+	}
 function Print(...)
 	local SpaceNum=_GetSpaceNum
 	local Num=0
@@ -252,5 +196,9 @@ function Print(...)
 		tbl[#tbl+1]=","
 	end
 	tbl[#tbl]=""
-	print(table.concat(tbl))
+	if #tbl==0 then 
+		print('nil')
+	else
+		print(table.concat(tbl))
+	end
 end
