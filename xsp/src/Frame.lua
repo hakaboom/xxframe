@@ -870,7 +870,7 @@ function OCR:new(data)--{Edition="tessocr_3.02.02",path="res/",lang="chi_sim"}
 end
 function OCR:getText(data)--{rect={},diff={},PSM=6,white="123456789"}
 	local Data
-	if data.binarize then
+	if data.binarize then 
 		Data=data.binarize 
 	else --二值化图片
 		local img=Image.fromScreen(data.Rect)
