@@ -19,48 +19,48 @@ local setmetatable,foreachi = setmetatable,table.foreachi
 local Color3B = Color3B
 local MainPointScale = {
 	["Middle"] = function(point,Arry)
-		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointScale.x)+Arry.Cur.Left
+		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointScale.y)+Arry.Cur.Top
 			return x,y
 	end,
 	["Left"] = function (point,Arry)--左中
-		local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
-		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+		local x=point.x*Arry.MainPointScale.x+Arry.Cur.Left
+		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointScale.y)+Arry.Cur.Top
 			return x,y
 	end,
 	["Right"] = function (point,Arry)--右中
-		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointScale.x)+Arry.Cur.Left
+		local y=Arry.Cur.y/2-((Arry.Dev.y/2-point.y)*Arry.MainPointScale.y)+Arry.Cur.Top
 			return x,y
 	end,
 	["Top"] = function (point,Arry)--上中 
-		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-		local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointScale.x)+Arry.Cur.Left
+		local y=point.y*Arry.MainPointScale.y+Arry.Cur.Top
 			return x,y
 	end,
 	["Bottom"] = function (point,Arry)--下中
-		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+		local x=Arry.Cur.x/2-((Arry.Dev.x/2-point.x)*Arry.MainPointScale.x)+Arry.Cur.Left
+		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointScale.y)+Arry.Cur.Top
 			return x,y
 	end,
 	["LeftTop"] = function (point,Arry)--左上
-		local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
-		local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+		local x=point.x*Arry.MainPointScale.x+Arry.Cur.Left
+		local y=point.y*Arry.MainPointScale.y+Arry.Cur.Top
 			return x,y
 	end,
 	["LeftBottom"] = function (point,Arry)--左下
-		local x=point.x*Arry.MainPointsScaleMode+Arry.Cur.Left
-		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+		local x=point.x*Arry.MainPointScale.x+Arry.Cur.Left
+		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointScale.y)+Arry.Cur.Top
 			return x,y
 	end,
 	["RightTop"] = function (point,Arry) --右上角
-		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-		local y=point.y*Arry.MainPointsScaleMode+Arry.Cur.Top
+		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointScale.x)+Arry.Cur.Left
+		local y=point.y*Arry.MainPointScale.y+Arry.Cur.Top
 			return x,y
 	end,
 	["RightBottom"] = function (point,Arry) --右下角
-		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointsScaleMode)+Arry.Cur.Left
-		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointsScaleMode)+Arry.Cur.Top
+		local x=Arry.Cur.x-((Arry.Dev.x-point.x)*Arry.MainPointScale.x)+Arry.Cur.Left
+		local y=Arry.Cur.y-((Arry.Dev.y-point.y)*Arry.MainPointScale.y)+Arry.Cur.Top
 			return x,y
 	end,
 }
@@ -75,8 +75,8 @@ local getScaleMainPoint = function (MainPoint,Anchor,Arry)	--缩放锚点
 	return {x=x,y=y}
 end
 local getScaleXY        = function (point,MainPoint,DstMainPoint,Arry)	--缩放XY
-	local x=DstMainPoint.x+(point.x-MainPoint.x)*Arry.AppurtenantScaleMode
-	local y=DstMainPoint.y+(point.y-MainPoint.y)*Arry.AppurtenantScaleMode
+	local x=DstMainPoint.x+(point.x-MainPoint.x)*Arry.AppurtenantScale.x
+	local y=DstMainPoint.y+(point.y-MainPoint.y)*Arry.AppurtenantScale.y
 	return x,y
 end
 local getScaleArea      = function (Area,DstMainPoint,MainPoint,Arry)	--缩放Area
@@ -117,13 +117,13 @@ local getScaleArea      = function (Area,DstMainPoint,MainPoint,Arry)	--缩放Ar
 		Area[3],Area[4]=getScaleXY({x=Area[3],y=Area[4]},MainPoint,DstMainPoint,Arry)
 	else
 		if #Area==2 then return
-			{(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left,
-			 (Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top}
+			{(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScale.x+Arry.Cur.Left,
+			 (Area[2]-Arry.Dev.Top)*Arry.AppurtenantScale.y+Arry.Cur.Top}
 		end
-		Area[1]=(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
-		Area[3]=(Area[3]-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
-		Area[2]=(Area[2]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
-		Area[4]=(Area[4]-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
+		Area[1]=(Area[1]-Arry.Dev.Left)*Arry.AppurtenantScale.x+Arry.Cur.Left
+		Area[3]=(Area[3]-Arry.Dev.Left)*Arry.AppurtenantScale.x+Arry.Cur.Left
+		Area[2]=(Area[2]-Arry.Dev.Top)*Arry.AppurtenantScale.y+Arry.Cur.Top
+		Area[4]=(Area[4]-Arry.Dev.Top)*Arry.AppurtenantScale.y+Arry.Cur.Top
 	end
 	local width=Area[3]-Area[1]
 	local height=Area[4]-Area[2]
@@ -216,8 +216,8 @@ function point:new(Base)--创建单点对象
 	if o.DstMainPoint then
 		o.Cur.x,o.Cur.y=getScaleXY(o.Dev,o.MainPoint,o.DstMainPoint,Arry)
 	elseif not o.Anchor then
-		o.Cur.x=(o.Dev.x-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
-		o.Cur.y=(o.Dev.y-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
+		o.Cur.x=(o.Dev.x-Arry.Dev.Left)*Arry.AppurtenantScale.x+Arry.Cur.Left
+		o.Cur.y=(o.Dev.y-Arry.Dev.Top)*Arry.AppurtenantScale.y+Arry.Cur.Top
 	else	
 		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)
 		o.Cur.x,o.Cur.y=getScaleXY(o.Dev,o.MainPoint,o.DstMainPoint,Arry)
@@ -364,13 +364,13 @@ function point:resetDev(x,y)--重设Dev坐标
 	self.Dev.y=y
 end
 function point:refresh()--刷新
-local o=self
-local Arry=o.Arry
+	local o=self
+	local Arry=o.Arry
 	if o.DstMainPoint then
 		o.Cur.x,o.Cur.y=getScaleXY(o.Dev,o.MainPoint,o.DstMainPoint,Arry)
 	elseif not o.Anchor then
-		o.Cur.x=(o.Dev.x-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
-		o.Cur.y=(o.Dev.y-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
+		o.Cur.x=(o.Dev.x-Arry.Dev.Left)*Arry.AppurtenantScale.x+Arry.Cur.Left
+		o.Cur.y=(o.Dev.y-Arry.Dev.Top)*Arry.AppurtenantScale.y+Arry.Cur.Top
 	else	
 		o.DstMainPoint=getScaleMainPoint(o.MainPoint,o.Anchor,Arry)	--计算锚点
 		o.Cur.x,o.Cur.y=getScaleXY(o.Dev,o.MainPoint,o.DstMainPoint,Arry)
@@ -378,8 +378,8 @@ local Arry=o.Arry
 end
 function point:offsetXY(x,y,offsetMode)--偏移坐标
 	if offsetMode=="withArry" then
-		pointx=self.Cur.x+(x*self.Arry.AppurtenantScaleMode)
-		pointy=self.Cur.y+(y*self.Arry.AppurtenantScaleMode)
+		pointx=self.Cur.x+(x*self.Arry.AppurtenantScale.x)
+		pointy=self.Cur.y+(y*self.Arry.AppurtenantScale.y)
 	else
 		pointx=self.Cur.x+x
 		pointy=self.Cur.y+y		
@@ -430,8 +430,8 @@ function multiPoint:new(Base)--创建多点对象
 	elseif not o.Anchor then 
 		foreachi(Base,function(k,v) v.Cur={x=nil,y=nil}
 			v.fuzz=o.fuzz
-			v.Cur.x=(v.x-Arry.Dev.Left)*Arry.AppurtenantScaleMode+Arry.Cur.Left
-			v.Cur.y=(v.y-Arry.Dev.Top)*Arry.AppurtenantScaleMode+Arry.Cur.Top
+			v.Cur.x=(v.x-Arry.Dev.Left)*Arry.AppurtenantScale.x+Arry.Cur.Left
+			v.Cur.y=(v.y-Arry.Dev.Top)*Arry.AppurtenantScale.y+Arry.Cur.Top
 			v.MainPoint=o.MainPoint
 			o[k]=point:newBymulti(v)
 		end)
@@ -670,7 +670,7 @@ function HUD:new(Base)--创建HUD
 		size = nil,
 		color = Base.color or "0xffffffff",
 		bg = Base.bg or "0xffffffff",
-		textsize = (Base.textsize or 20)*_const.Arry.AppurtenantScaleMode,
+		textsize = (Base.textsize or 20)*_const.Arry.AppurtenantScale.y,
 		id = createHUD(),
 		pos = Base.pos or 0,
 		text = Base.text or "",
@@ -868,13 +868,13 @@ function OCR:new(data)--{Edition="tessocr_3.02.02",path="res/",lang="chi_sim"}
 	o.ocr=ocr
 	return o
 end
-function OCR:getText(data)--{rect={},diff={},PSM=6,white="123456789"}
-	local Data
+function OCR:getText(data)--{Rect={},diff={},PSM=6,white="123456789"}
+	local imgData
 	if data.binarize then 
-		Data=data.binarize 
+		imgData=data.binarize 
 	else --二值化图片
 		local img=Image.fromScreen(data.Rect)
-		Data=img:binarize(data.diff)	
+		imgData=img:binarize(data.diff)	
 	end
 	local PSM=data.PSM or self.PSM
 	local White=data.white or self.white
@@ -884,7 +884,7 @@ function OCR:getText(data)--{rect={},diff={},PSM=6,white="123456789"}
 	self.ocr:setWhitelist(White)--设置白名单	
 	self.ocr:setBlacklist(Black)
 
-	local code,result,detail=self.ocr:getText(Data)
+	local code,result,detail=self.ocr:getText(imgData)
 		if code == 0 then
 			local text=result:trim()
 			 printf('text = %s', text)
@@ -898,7 +898,7 @@ function OCR:release()--释放字库(释放后再次使用需要重新启动)
 	self.ocr:release()
 end
 function OCR:restart()--释放后重新启动
-local ocr,msg=tessocr.create({
+	local ocr,msg=tessocr.create({
 		path=self.path,
 		lang=self.lang,
 	})
@@ -1003,67 +1003,62 @@ end
 --system对象
 System={ --
 }
-function System:new(DevScreen,CurScreen,initfor,MainPointsScaleMode,AppurtenantScaleMode,GameAspect)
+function System:new(DevScreen,CurScreen,initfor,MainPointScaleMode,AppurtenantScaleMode) --,GameAspect
 	local o={
-		Dev=DevScreen,
-		Cur=CurScreen,
+		-- Dev=DevScreen,
+		-- Cur=CurScreen,
 		keepTime=0,
 		Arry={
 			Cur=TableCopy(CurScreen),
 			Dev=TableCopy(DevScreen),
-			MainPointsScaleMode=MainPointsScaleMode or false,
-			AppurtenantScaleMode=AppurtenantScaleMode or false,
 		},
 	}
 	-----------------------------------------------------------------
+	local Dev,Cur = o.Arry.Dev,o.Arry.Cur
 	local DevX,DevY,CurX,CurY
 	if initfor==1 or initfor==2 then 
-		DevX=o.Dev.Width-o.Dev.Left-o.Dev.Right		--开发机X减去黑边
-		DevY=o.Dev.Height-o.Dev.Top-o.Dev.Bottom		--开发机Y减去黑边
-		CurX=o.Cur.Width-o.Cur.Left-o.Cur.Right		--当前机器X减去黑边
-		CurY=o.Cur.Height-o.Cur.Top-o.Cur.Bottom		--当前机器Y减去黑边
+		DevX=Dev.Width-Dev.Left-Dev.Right		--开发机X减去黑边
+		DevY=Dev.Height-Dev.Top-Dev.Bottom		--开发机Y减去黑边
+		CurX=Cur.Width-Cur.Left-Cur.Right		--当前机器X减去黑边
+		CurY=Cur.Height-Cur.Top-Cur.Bottom		--当前机器Y减去黑边
 	elseif initfor==3 then
-		DevX=o.Dev.Height-o.Dev.Top-o.Dev.Bottom
-		DevY=o.Dev.Width-o.Dev.Left-o.Dev.Right
-		CurX=o.Cur.Height-o.Cur.Top-o.Cur.Bottom
-		CurY=o.Cur.Width-o.Cur.Left-o.Cur.Right
+		DevX=Dev.Height-Dev.Top-Dev.Bottom
+		DevY=Dev.Width-Dev.Left-Dev.Right
+		CurX=Cur.Height-Cur.Top-Cur.Bottom
+		CurY=Cur.Width-Cur.Left-Cur.Right
 	end
-		o.Arry.Dev.x,o.Arry.Dev.y,o.Arry.Cur.x,o.Arry.Cur.y=DevX,DevY,CurX,CurY
-		o.Arry.x=CurX/DevX
-		o.Arry.y=CurY/DevY
-		o.Arry.Dev.scale,o.Arry.Cur.scale=DevX/DevY,CurX/CurY--宽高比
+
+	Dev.x,Dev.y,Cur.x,Cur.y=DevX,DevY,CurX,CurY
+	local XScale = CurX/DevX
+	local YScale = CurY/DevY
 	--------------------------------------------------------------------------
-	if MainPointsScaleMode=="Height" then		--锚点的相对坐标缩放
-		o.Arry.MainPointsScaleMode=o.Arry.Cur.y/o.Arry.Dev.y
-	elseif MainPointsScaleMode=="Width" then	
-		o.Arry.MainPointsScaleMode=o.Arry.Cur.x/o.Arry.Dev.x
-	elseif MainPointsScaleMode=="unequal" then ---全屏游戏用
-		if o.Arry.Cur.scale>GameAspect then
-			o.Arry.MainPointsScaleMode=o.Arry.Cur.y/o.Arry.Dev.y
-		else
-			o.Arry.MainPointsScaleMode=(o.Arry.Cur.y/o.Arry.Dev.y)*(1/GameAspect)
-		end
+	local MainPointScale = {x=nil,y=nil}
+	o.Arry.MainPointScale = MainPointScale
+	if type(MainPointScaleMode) == 'table' then
+		MainPointScale.x = MainPointScaleMode.x == 'width' and XScale or YScale
+		MainPointScale.y = MainPointScaleMode.y == 'width' and XScale or YScale
+	elseif type(MainPointScaleMode) == 'string' then
+		MainPointScale.x = MainPointScaleMode == 'width' and XScale or YScale
+		MainPointScale.y = MainPointScaleMode == 'width' and XScale or YScale	
 	else
 		print("没有设置锚点缩放模式")
 		xmod.exit()
 	end	
 
-	if AppurtenantScaleMode=="Height" then		--多点从属点的相对坐标缩放
-		o.Arry.AppurtenantScaleMode=o.Arry.Cur.y/o.Arry.Dev.y
-	elseif AppurtenantScaleMode=="Width" then
-		o.Arry.AppurtenantScaleMode=o.Arry.Cur.x/o.Arry.Dev.x
-	elseif AppurtenantScaleMode=="unequal" then	--全屏游戏用
-		if o.Arry.Cur.scale>GameAspect then
-			o.Arry.AppurtenantScaleMode=o.Arry.Cur.y/o.Arry.Dev.y
-		else
-			o.Arry.AppurtenantScaleMode=(o.Arry.Cur.y/o.Arry.Dev.y)*(1/GameAspect)
-		end
+	local AppurtenantScale = {x=nil,y=nil}
+	o.Arry.AppurtenantScale = AppurtenantScale
+	if type(AppurtenantScaleMode) == 'table' then
+		AppurtenantScale.x = AppurtenantScaleMode.x == 'width' and XScale or YScale
+		AppurtenantScale.y = AppurtenantScaleMode.y == 'width' and XScale or YScale
+	elseif type(AppurtenantScaleMode) == 'string' then
+		AppurtenantScale.x = AppurtenantScaleMode == 'width' and XScale or YScale
+		AppurtenantScale.y = AppurtenantScaleMode == 'width' and XScale or YScale	
 	else
-		print("没有设置多点从属点")
+		print("没有设置锚点缩放模式")
 		xmod.exit()
-	end
+	end	
 	
-	setmetatable(o,{__index=self} )
+	setmetatable(o,{ __index=System} )
 	if _const.Arry==nil then _const.Arry=o.Arry end
 	return o
 end
@@ -1083,7 +1078,7 @@ end
 function System:addSystemData(key,value)
 	self.SystemData[key] = value
 end
-function System:getSystemData()--一些系统的属性,按照需求自己添加
+function System:getSystemData() --一些系统的属性,按照需求自己添加
 	local UserInfo,code = script.getUserInfo()
 	local ScriptInfo, code = script.getScriptInfo()
 	local data={

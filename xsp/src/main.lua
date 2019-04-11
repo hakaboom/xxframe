@@ -21,6 +21,9 @@ DevScreen={	--开发分辨率
 }
 CurScreen={	--本机分辨率
 	Top=0,Bottom=0,Left=0,Right=0,
-	Width=1280,Height=720,
+	Width=2280,Height=1080,
 }
-_K=System:new(DevScreen,CurScreen,1,"Height","Height")
+_K=System:new(DevScreen,CurScreen,1,{x='width',y='height'},{x='width',y='height'})
+
+a=point:new({x=100,y=200})
+print(a)
