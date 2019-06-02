@@ -130,6 +130,18 @@ local getScaleArea      = function (Area,DstMainPoint,MainPoint,Arry)	--缩放Ar
 
 	return Rect(Area[1],Area[2],width,height)
 end
+local tableCopy 		= function (tbl)
+	local new_table = {}
+	for index,value in pairs(tbl) do
+		if type(value) == 'table' then
+			new_table[index] = tableCopy(value)
+		else
+			new_table[index] = value
+		end
+	end
+	return new_table
+end
+
 
 _printcmpColorErr_ = function (Cur,Dev,tag,key) 
 	tag=tag or "" 
@@ -572,11 +584,11 @@ function multiPoint:findColors(returnType)--区域多点找色
 		end
 	return false
 end
-function multiPoint:findColorEX(Ac,fuzz)--用多点找色返回的点去取比色,Ac设置number,会调用new时的Ac个点给找色
+function multiPoint:findColorEX(ac,fuzz)--用多点找色返回的点去取比色,Ac设置number,会调用new时的Ac个点给找色
 	assert(self.Area, "findColorEX没有传入Area")
-	Ac=Ac or 1
+	local ac=ac or 1
 	local color,returnTbl={},{}
-		for i=1,Ac do v=self[i]
+		for i=1,ac do v=self[i]
 			color[i]={
 				pos=self[i]:getXYtoPoint(),
 				color=Color3B(v.Dev.color),
@@ -588,7 +600,7 @@ function multiPoint:findColorEX(Ac,fuzz)--用多点找色返回的点去取比�
 	local initpoint=screen.findColors(self.Area,color,(fuzz or self.fuzz),self.priority,999)
 		--print(#initpoint)
 		if #initpoint > 0 then
-			local Allpoint=TableCopy(self:getAllpoint())
+			local Allpoint=tableCopy(self:getAllpoint())
 				for k,v in ipairs(initpoint) do
 					local Dst={x=initpoint[k].x,y=initpoint[k].y}
 					table.foreachi(Allpoint,function(k,v) v.MainPoint=MainPoint v.DstMainPoint=Dst v:refresh() end)
@@ -1005,12 +1017,10 @@ System={ --
 }
 function System:new(DevScreen,CurScreen,initfor,MainPointScaleMode,AppurtenantScaleMode) --,GameAspect
 	local o={
-		-- Dev=DevScreen,
-		-- Cur=CurScreen,
 		keepTime=0,
 		Arry={
-			Cur=TableCopy(CurScreen),
-			Dev=TableCopy(DevScreen),
+			Cur=tableCopy(CurScreen),
+			Dev=tableCopy(DevScreen),
 		},
 	}
 	-----------------------------------------------------------------

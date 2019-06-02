@@ -25,5 +25,4 @@ CurScreen={	--本机分辨率
 }
 _K=System:new(DevScreen,CurScreen,1,{x='width',y='height'},{x='width',y='height'})
 
-a=point:new({x=100,y=200})
-print(a)
+print(os.date('%S',1000))
