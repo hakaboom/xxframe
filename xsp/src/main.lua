@@ -25,4 +25,6 @@ CurScreen={	--本机分辨率
 }
 _K=System:new(DevScreen,CurScreen,1,{x='width',y='height'},{x='width',y='height'})
 
-print(os.date('%S',1000))
+
+print(Base.rgbToHSL(Color3F(0,0,0.5)))
+print(Base.rgbToHSV(Color3F(0,0,0.5)))

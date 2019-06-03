@@ -161,6 +161,12 @@ function string.jsonDecode(s)
 	return xmodApi['cjson'].decode(s)
 end
 
+function math.round(num,i)
+    local mult = 10^(i or 0)
+    local mult10 = mult * 10
+    return math.floor((num * mult10 + 5)/10)/ mult
+end
+
 Base = {}
 function Base.jsonDecode(s)
 	return xmodApi['cjson'].decode(s)
@@ -169,32 +175,110 @@ function Base.jsonEncode(tbl)
 	return xmodApi['cjson'].encode(tbl)
 end
 local timeTransform={
+	'ms','s','m','h','d','M',
 	['ms']=1000,['s']=60,['m']=60,['h']=24,['d']=31,['M']=12
 }
 function Base.timeTransform(time,pattern,repl)
 	if not pattern or not repl or not time then error('received nil') end
 	local time = time
-	local t = {'ms','s','m','h','d','M'}
-	local paIndex=table.getIndexByValue(t,pattern)
-	local reIndex=table.getIndexByValue(t,repl)
-	--print(paIndex,reIndex)
+	local paIndex=table.getIndexByValue(timeTransform,pattern)
+	local reIndex=table.getIndexByValue(timeTransform,repl)
 	if paIndex < reIndex then
 		for i=paIndex,reIndex-1 do
-			time = time/timeTransform[t[i]]
+			time = time/timeTransform[timeTransform[i]]
 		end
 	elseif paIndex > reIndex then
 		for i=reIndex,paIndex-1 do
-			time = time*timeTransform[t[i]]
+			time = time*timeTransform[timeTransform[i]]
 		end	
 	end
-	--print(time)
 	return time
 end
 function Base.formatTime(time,pattern)
 	local time = Base.timeTransform(time,pattern,'s')
-
+	return string.format("%.2d时%.2d分%.2d秒",time/(60*60),time/60%60,time%60)
 end
 
+local function transformColor(...)
+	local arg = {...}
+	local t = {['r']=0,['g']=0,['b']=0}
+	if #arg == 1 then
+		local _type=type(arg[1])
+		if _type=='userdata' and arg[1].__tag then
+			if arg[1].__tag == 'Color3F' then
+				t = Color3B(arg[1])
+			elseif arg[1].__tag == 'Color3B' then
+				t = arg[1]
+			else error()
+			end
+		elseif _type=='table' then
+			if arg[1].r and arg[1].b and arg[1].b then
+				t['r']=arg[1].r
+				t['g']=arg[1].g
+				t['b']=arg[1].b
+			end
+		elseif _type=='string' then
+			t = Color3B(arg[1])
+		end
+	elseif #arg==3 then -- r,g,b
+		t = Color3B(arg[1],arg[2],arg[3])
+	end
+	return t
+end
+local function HSLToString(t)
+	return string.format('HSL<%d,%d,%d>',
+		t.H,
+		t.S,
+		t.L)
+end
+function Base.rgbToHSL(...)
+	local color = Color3F(transformColor(...))
+	local r,g,b = color.r,color.g,color.b
+    local min = math.min(r, g, b)
+    local max = math.max(r, g, b)
+    local delta = max - min
+
+    local H, S, L = 0, 0, ((min+max)/2)
+
+    if L > 0 and L < 50 then S = delta/(2*L) end
+    if L >= 50 and L < 100 then S = delta/(2-(2*L)) end
+
+    if delta > 0 then
+       	if max == r and max ~= g then H = H + (g-b)/delta end
+       	if max == g and max ~= b then H = H + 2 + (b-r)/delta end
+       	if max == b and max ~= r then H = H + 4 + (r-g)/delta end
+       	H = H / 6;
+    end
+
+    if H < 0 then H = H + 1 end
+    if H > 1 then H = H - 1 end
+    S=math.round(S,2)*100
+    L=math.round(L,2)*100
+    return setmetatable({H=H * 360,S=S,L=L},{
+    	__tostring=HSLToString,
+    })
+end
+local function HSVToString(t)
+	return string.format('HSV<%d,%d,%d>',
+		t.H,
+		t.S,
+		t.V)
+end
+function Base.rgbToHSV(...)
+	local color = transformColor(...)
+	local r,g,b = color.r,color.g,color.b
+	local H,S,V = 0,0,0
+	local max=math.max(r,g,b)
+	local min=math.min(r,g,b)
+	if r == max then H = (g-b)/(max-min) end
+	if g == max then H = 2 + (b-r)/(max-min) end
+	if b == max then H = 4 + (r-g)/(max-min) end
+	H = math.floor((H * 60) + 0.5)
+	if H < 0 then H = H + 360 end
+	V=math.round(max/255,2)*100
+	S=math.round(((max-min)/max),2)*100
+	return setmetatable({H=H,S=S,V=V},{__tostring=HSVToString}) --H[0~360] S[0~1] V[0~1]
+end
 
 function slp(T)	--传入秒
 	T=T or 0.05
@@ -298,36 +382,36 @@ function Print(...)
 		print(table.concat(tbl))
 	end
 end
-local format=string.format
-function Print(...)
-	local arg={...}
-	local tbl,Num={},0
-	local function printTable(t,Num)
-		Num=Num+1
-		local tbl = {}
-		for k,v in pairs(t) do
-			local _type,str=type(v)
-			local _space=_spaceNumRep(SpaceNum,Num)
-			if _type=='table' and k~='_G' and not v.package then
-				str=format()
-			end
-		end
-	end
-	for i=1,#arg do
-		local value,str=arg[i]
-		local _type=type(value)
-		if _type=='table' then
-			str=format('\n Table = { \n %s ',printTable(t,Num))
-		elseif _type=='string' then
-			str=format('%s, ',(value:utf8Len()==0 and 'empty_s' or value))
-		else
-			str=format('%s, ',tostring(value))
-		end
-		tbl[#tbl+1]=str
-	end
-	if #tbl==0 then 
-		print('nil')
-	else
-		print(table.concat(tbl))
-	end
-end
+-- local format=string.format
+-- function Print(...)
+-- 	local arg={...}
+-- 	local tbl,Num={},0
+-- 	local function printTable(t,Num)
+-- 		Num=Num+1
+-- 		local tbl = {}
+-- 		for k,v in pairs(t) do
+-- 			local _type,str=type(v)
+-- 			local _space=_spaceNumRep(SpaceNum,Num)
+-- 			if _type=='table' and k~='_G' and not v.package then
+-- 				str=format()
+-- 			end
+-- 		end
+-- 	end
+-- 	for i=1,#arg do
+-- 		local value,str=arg[i]
+-- 		local _type=type(value)
+-- 		if _type=='table' then
+-- 			str=format('\n Table = { \n %s ',printTable(t,Num))
+-- 		elseif _type=='string' then
+-- 			str=format('%s, ',(value:utf8Len()==0 and 'empty_s' or value))
+-- 		else
+-- 			str=format('%s, ',tostring(value))
+-- 		end
+-- 		tbl[#tbl+1]=str
+-- 	end
+-- 	if #tbl==0 then 
+-- 		print('nil')
+-- 	else
+-- 		print(table.concat(tbl))
+-- 	end
+-- end
