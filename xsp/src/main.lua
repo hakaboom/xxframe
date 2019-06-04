@@ -25,6 +25,8 @@ CurScreen={	--本机分辨率
 }
 _K=System:new(DevScreen,CurScreen,1,{x='width',y='height'},{x='width',y='height'})
 
-
-print(Base.rgbToHSL(Color3F(0,0,0.5)))
-print(Base.rgbToHSV(Color3F(0,0,0.5)))
+color=require'Color'
+a=ColorHSV(0xffffff)
+b=ColorHSV(100,50,50)
+print(b)
+print(a)
