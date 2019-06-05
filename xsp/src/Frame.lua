@@ -164,10 +164,10 @@ _printmultiPoint_  = function (multi,Num)
 		str=str..">"
 	return str
 end
-_printcustomData_  = function (_type)
-	if _type=="point" then
+_printcustomData_  = function (__tag)
+	if __tag=="point" then
 		return _printPoint_
-	elseif _type=="multiPoint" then
+	elseif __tag=="multiPoint" then
 		return _printmultiPoint_ 
 	end
 end
@@ -207,7 +207,7 @@ _point_metatable={
 }
 function point:new(Base)--创建单点对象
 	local o={
-		_type="point",
+		__tag="point",
 		fuzz =	Base.fuzz or 95,
 		index =	Base.index or 1,
 		Anchor = Base.Anchor,
@@ -239,7 +239,7 @@ function point:new(Base)--创建单点对象
 end
 function point:newByCur(Base)
 	local o={
-		_type = "point",
+		__tag = "point",
 		fuzz = Base.fuzz or 95,
 		index =	Base.index or 1,
 		Anchor = Base.Anchor,
@@ -259,7 +259,7 @@ function point:newByCur(Base)
 end
 function point:newBymulti(Base)
 	local o={
-		_type = "point",
+		__tag = "point",
 		fuzz = Base.fuzz or 95,
 		index = Base.index or 1,
 		Anchor = Base.Anchor,
@@ -417,7 +417,7 @@ _multiPoint_metatable={
 }
 function multiPoint:new(Base)--创建多点对象
 	local o={
-		_type = "multiPoint",
+		__tag = "multiPoint",
 		_tag = Base._tag,
 		fuzz = Base.fuzz or 95,
 		index = Base.index,
@@ -463,7 +463,7 @@ function multiPoint:new(Base)--创建多点对象
 end
 function multiPoint:newBypoint(Base)--由单点对象创建多点对象
 	local o={
-		_type =	"multiPoint",
+		__tag =	"multiPoint",
 		_tag = Base._tag,
 		fuzz = Base.fuzz or 95,
 		index = Base.index,

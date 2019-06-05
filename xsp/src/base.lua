@@ -1,5 +1,5 @@
 local xmodApi={}
-for _,v in pairs({'crypto','cjson'}) do
+for _,v in pairs({'crypto','cjson','lfs'}) do
 	xmodApi[v] = require(v)
 end
 
@@ -146,7 +146,6 @@ function string.utf8Sub(s,startIndex,endIndex)
 	else
 		return string.sub(s,SubStringGetTrueIndex(s,startIndex),SubStringGetTrueIndex(s,endIndex+1)-1)
 	end
-
 end
 function string.Base64Encode(s)
 	return xmodApi['crypto'].base64Encode(s)
@@ -167,6 +166,7 @@ function math.round(num,i)
     return math.floor((num * mult10 + 5)/10)/ mult
 end
 
+
 Base = {}
 function Base.jsonDecode(s)
 	return xmodApi['cjson'].decode(s)
@@ -174,7 +174,6 @@ end
 function Base.jsonEncode(tbl)
 	return xmodApi['cjson'].encode(tbl)
 end
---/////////////////////////////////
 local timeTransform={
 	'ms','s','m','h','d','M',
 	['ms']=1000,['s']=60,['m']=60,['h']=24,['d']=31,['M']=12
@@ -201,138 +200,55 @@ function Base.formatTime(time,pattern)
 end
 
 
-function slp(T)	--传入秒
-	T=T or 0.05
-	T=T*1000
-	sleep(T)
-end
 
-function getTableFromString(str,aim) --从字符串中查找符合aim的条件,以表返回
-	local insert=table.insert
-	local aimTable={}
-	for v in string.gmatch(str,aim) do
-		insert(aimTable,v)
-	end
-	return aimTable
+--Print抄自Zqys,在群文件中开源的print代码
+local _SpaceNum = {}
+for i = 1,10 do
+	_SpaceNum[i] = ('\t'):rep(i)
 end
-
-function getTableRepeatnum(tbl)--获取表中重复的数字
-	local t={}
-	for k,v in pairs(tbl) do
-		if t[v] then
-			t[v]=t[v]+1
-		else
-			t[v]=1
-		end
-	end
-	return t
-end
-
-
-function _SpaceNumRep(SpaceNum,Num)
-	if SpaceNum[Num] then
-		return SpaceNum[Num]
-	end
-	return Num == 0 and '' or string.rep('\t',Num)
-end
-local _GetSpaceNum = {
-		"\t",
-		"\t\t",
-		"\t\t\t",
-		"\t\t\t\t",
-		"\t\t\t\t\t",
-		"\t\t\t\t\t\t",
-		"\t\t\t\t\t\t\t",
-		"\t\t\t\t\t\t\t\t",
-		"\t\t\t\t\t\t\t\t\t",
-		"\t\t\t\t\t\t\t\t\t\t",
-		"\t\t\t\t\t\t\t\t\t\t\t",
-	}
-function Print(...)
-	local SpaceNum,format=_GetSpaceNum,string.format
-	local Num=0
-	local arg={...}
-	local tbl={}
-	local function printTable(t,Num)
-		Num=Num+1
-		local tbl={}
+local format = string.format
+function Print(...) 
+	local arg,str,_print = {...},{}
+	_print = function(t,SpaceNum)
+		local str = {}
+		SpaceNum = SpaceNum + 1
 		for k,v in pairs(t) do
-			local _type=type(v)
-			local _Space=_SpaceNumRep(SpaceNum,Num)
-			if _type=="table" and (v._type=="point" or v._type=="multiPoint") then
-				tbl[#tbl+1]=format("%s[%s] = %s",_Space,tostring(k),(_printcustomData_(v._type))(v,_SpaceNumRep(SpaceNum,Num+1)))
-			elseif _type=="table" and k~="_G" and(not v.package) then
-				tbl[#tbl+1]=format("%s[%s](tbl)={ \n %s %s }",_Space,tostring(k),printTable(v,Num),_SpaceNumRep(SpaceNum,Num))
-			elseif _type=="table" and (v.package) then
-				tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),_type,v)
-			elseif _type=="boolean" then
-				tbl[#tbl+1]=format("%s[%s](bool) = %s",_Space,tostring(k),(v and "true" or "false"))
-			elseif _type=="string" then
-				tbl[#tbl+1]=format("%s[%s](str) = %s",_Space,tostring(k),(v=="" and "empty_s"  or v))
+			local value,_type = tostring(v),type(v)
+			if _type == 'table' and k~='_G' and not v.package then
+				if v.__tag then
+					str[#str+1] = format('%s[%s](cur) = %s\r',(_SpaceNum[SpaceNum] or ('\t'):rep(SpaceNum)),tostring(k),value)
+				else
+					str[#str+1] = format('%s[%s](table) = {\r',(_SpaceNum[SpaceNum] or ('\t'):rep(SpaceNum)),tostring(k))
+					if not next(v) then
+						str[#str] = str[#str]:gsub('\r', '}\r')
+					else
+						str[#str+1] = format('%s%s}\r',_print(v,SpaceNum),(_SpaceNum[SpaceNum] or ('\t'):rep(SpaceNum)))
+					end
+				end
 			else
-				tbl[#tbl+1]=format("%s[%s](%s) = %s",_Space,tostring(k),string.sub(_type,1,3),v)
+	                --[ (附加功能: 更加人性化的function显示)
+	                value = _type == 'function' and value:gsub('[^0]+', '', 1) or value --]]
+
+	                --[ (附加功能: 更加简便的前缀)
+	                _type = _type:sub(1, not (#_type > 6) and 3 or 4) --]]
+
+	                --[[ (附加功能: 替换table中string的转义)
+	                for k, v in pairs {['r'] = '\r', ['t'] = '\t', ['n'] = '\n', ['0'] = '\0'} do
+	                    value = value:gsub(v, '(◇\\' .. k .. ')') --注意, 1.9中使用必须把↑↑上面的['0']项删掉
+	                end --]]
+	                str[#str + 1] = format('%s[%s](%s) = %s\r',(_SpaceNum[SpaceNum] or ('\t'):rep(SpaceNum)),tostring(k),_type,value)
 			end
-			tbl[#tbl+1]="\n"
 		end
-		return table.concat(tbl)
+		return table.concat(str)
 	end
-	for i=1,#arg do
-		local t=arg[i]
-		local _type=type(t)
-		if _type=="table" then
-			if (t._type=="point" or t._type=="multiPoint") then
-				tbl[#tbl+1]=format("%s",(_printcustomData_(t._type))(t))
+		for i=1, #arg do
+			local _type = type(arg[i])
+			if _type == 'table' and not arg[i].__tag then
+				str[#str + 1] = format('\r◇ Table = {\r %s }\r\r',_print(arg[i], 0))
 			else
-				tbl[#tbl+1]=format("\n Table = { \n %s }",printTable(t,Num))
+				str[#str + 1] = format('%s%s',tostring(arg[i]),(i~=#arg and ', ' or ''))
 			end
-		elseif _type=="string" then
-			tbl[#tbl+1]=format("%s",(t=="" and "empty_s"  or t))
-		elseif _type=="boolean" then
-			tbl[#tbl+1]=format("%s",(t and "true" or "false"))
-		elseif _type=="nil" then
-			tbl[#tbl+1]=format("%s","nil")
-		else
-			tbl[#tbl+1]=format("%s",t)
 		end
-		tbl[#tbl+1]=","
-	end
-	tbl[#tbl]=""
-	if #tbl==0 then 
-		print('nil')
-	else
-		print(table.concat(tbl))
-	end
+		str = table.concat(str)
+	print(str)
 end
--- local format=string.format
--- function Print(...)
--- 	local arg={...}
--- 	local tbl,Num={},0
--- 	local function printTable(t,Num)
--- 		Num=Num+1
--- 		local tbl = {}
--- 		for k,v in pairs(t) do
--- 			local _type,str=type(v)
--- 			local _space=_spaceNumRep(SpaceNum,Num)
--- 			if _type=='table' and k~='_G' and not v.package then
--- 				str=format()
--- 			end
--- 		end
--- 	end
--- 	for i=1,#arg do
--- 		local value,str=arg[i]
--- 		local _type=type(value)
--- 		if _type=='table' then
--- 			str=format('\n Table = { \n %s ',printTable(t,Num))
--- 		elseif _type=='string' then
--- 			str=format('%s, ',(value:utf8Len()==0 and 'empty_s' or value))
--- 		else
--- 			str=format('%s, ',tostring(value))
--- 		end
--- 		tbl[#tbl+1]=str
--- 	end
--- 	if #tbl==0 then 
--- 		print('nil')
--- 	else
--- 		print(table.concat(tbl))
--- 	end
--- end
