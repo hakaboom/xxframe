@@ -1,3 +1,5 @@
+--扩展ColorHSV和ColorHSL
+
 local colorApi={
 	['Color3B']=Color3B,['Color3F']=Color3F,
 }
@@ -9,17 +11,17 @@ local transformApi={
 		Color3B='toC3B',Color3F='toC3F',ColorHSV='toHSV',ColorHSL='toHSL',
 	},
 }
-local floor=math.floor
+local floor,min,max,type,setmetatable=math.floor,math.min,math.max,type,setmetatable
 local function round(num,i)
     local mult = 10^(i or 0)
     local mult10 = mult * 10
-    return math.floor((num * mult10 + 5)/10)/ mult
+    return floor((num * mult10 + 5)/10)/ mult
 end
 
 local function rgbToHSL(r,g,b) --Color3F {h,s,l}
 	local r,g,b = r,g,b
-    local min = math.min(r, g, b)
-    local max = math.max(r, g, b)
+    local min = min(r, g, b)
+    local max = max(r, g, b)
     local delta = max - min
 
     local H, S, L = 0, 0, ((min+max)/2)
@@ -45,8 +47,8 @@ local function rgbToHSL(r,g,b) --Color3F {h,s,l}
 end
 local function rgbToHSV(r,g,b) --Color3B {h,s,v}
 	local h,s,v = 0,0,0
-	local max=math.max(r,g,b)
-	local min=math.min(r,g,b)
+	local max=max(r,g,b)
+	local min=min(r,g,b)
 	if r == max and g ~= max then h = (g-b)/(max-min) end
 	if g == max and b ~= max then h = 2 + (b-r)/(max-min) end
 	if b == max and r ~= max then h = 4 + (r-g)/(max-min) end
@@ -180,7 +182,7 @@ setmetatable(ColorHSL,{
 })
 
 
-function transformColor(pattern,...) --pattern:Color3B,Color3F,ColorHSV,ColorHSL,为啥写了好像没啥用
+function transformColor(pattern,...) --pattern:Color3B,Color3F,ColorHSV,ColorHSL,为啥写了好像没啥用\\挠头
 	local pattern = pattern or error('received nil')
 	local arg={...}
 	local r,g,b,h,s,v,l

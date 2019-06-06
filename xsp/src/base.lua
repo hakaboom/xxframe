@@ -198,9 +198,27 @@ function Base.formatTime(time,pattern)
 	local time = Base.timeTransform(time,pattern,'s')
 	return string.format("%.2d时%.2d分%.2d秒",time/(60*60),time/60%60,time%60)
 end
-
-
-
+function Base.pairsPath(path)
+	local tbl = {}
+	local path = path or xmod.getPrivatePath()
+	local function _pairs(obj)
+		local new_table = {}
+		for file in lfs.dir(path) do
+			if file~='.' and file~='..' then
+				tbl[file] = new_table
+				local f=string.format('%s/%s',path,file)
+				local attr = lfs.attributes(f)
+				if attr.mode == 'directory' then
+					new_table[file] = _pairs(f)
+				else
+					new_table = attr
+				end
+			end
+		end
+		return tbl
+	end
+	return _pairs(path)
+end
 --Print抄自Zqys,在群文件中开源的print代码
 local _SpaceNum = {}
 for i = 1,10 do

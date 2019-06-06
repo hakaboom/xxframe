@@ -11,8 +11,6 @@ end
 --把自定义取色放到叉叉集成开发环境下的data.lua,可以直接覆盖,抓图的时候用Anchor
 --打印函数为Print()
 --初始化必须调用
---	K=System:new(DevScreen,CurScreen,1,"Height","Height")
---	需要自己调用screen.init
 
 require'base'require'Frame' --必须要的前置代码
 DevScreen={	--开发分辨率
@@ -25,3 +23,14 @@ CurScreen={	--本机分辨率
 }
 _K=System:new(DevScreen,CurScreen,1,{x='width',y='height'},{x='width',y='height'})
 
+
+for i=1,100000 do
+	multiPoint:new({
+		{x=100,y=100},
+		{x=100,y=100},
+		{x=100,y=100},
+		{x=100,y=100},
+		{x=100,y=100},
+	})
+	sleep(500)
+end
