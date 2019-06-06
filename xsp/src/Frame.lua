@@ -211,7 +211,7 @@ function point:new(Base)--创建单点对象
 		fuzz =	Base.fuzz or 95,
 		index =	Base.index or 1,
 		Anchor = Base.Anchor,
-		MainPoint =	Base.MainPoint,
+		MainPoint =	Base.MainPoint or {x=0,y=0},
 		DstMainPoint = Base.DstMainPoint,
 		Dev={
 			x = Base.x,
@@ -243,7 +243,7 @@ function point:newByCur(Base)
 		fuzz = Base.fuzz or 95,
 		index =	Base.index or 1,
 		Anchor = Base.Anchor,
-		MainPoint = Base.MainPoint,
+		MainPoint = Base.MainPoint or {x=0,y=0},
 		DstMainPoint = Base.DstMainPoint,
 	--	Dev={} --no Dev
 		Cur={
@@ -417,18 +417,18 @@ _multiPoint_metatable={
 }
 function multiPoint:new(Base)--创建多点对象
 	local o={
-		__tag = "multiPoint",
-		_tag = Base._tag,
-		fuzz = Base.fuzz or 95,
-		index = Base.index,
-		indexN = Base.indexN or 1,
-		Area = Base.Area,
-		MainPoint =	Base.MainPoint,
-		Anchor = Base.Anchor,
+		__tag 		 = "multiPoint",
+		_tag 		 = Base._tag,
+		fuzz 		 = Base.fuzz or 95,
+		index 		 = Base.index,
+		indexN 		 = Base.indexN or 1,
+		Area 		 = Base.Area,
+		MainPoint    = Base.MainPoint or {x=0,y=0},
+		Anchor	     = Base.Anchor,
 		DstMainPoint = Base.DstMainPoint,
-		offset = Base.offset,
-		limit =	Base.limit,
-		priority = Base.priority or screen.PRIORITY_DEFAULT,
+		offset 		 = Base.offset,
+		limit   	 = Base.limit,
+		priority     = Base.priority or screen.PRIORITY_DEFAULT,
 	}
 	o.Arry=Base.Arry or _const.Arry
 	local Arry=o.Arry
@@ -463,18 +463,18 @@ function multiPoint:new(Base)--创建多点对象
 end
 function multiPoint:newBypoint(Base)--由单点对象创建多点对象
 	local o={
-		__tag =	"multiPoint",
-		_tag = Base._tag,
-		fuzz = Base.fuzz or 95,
-		index = Base.index,
-		indexN = Base.indexN or 1,
-		Area = Base.Area,
-		MainPoint = Base.MainPoint ,
-		Anchor = Base.Anchor,
+		__tag 		 = "multiPoint",
+		_tag 		 = Base._tag,
+		fuzz 		 = Base.fuzz or 95,
+		index 		 = Base.index,
+		indexN 		 = Base.indexN or 1,
+		Area 		 = Base.Area,
+		MainPoint    = Base.MainPoint or {x=0,y=0},
+		Anchor 		 = Base.Anchor,
 		DstMainPoint = Base.DstMainPoint,
-		offset = Base.offset,
-		limit = Base.limit,
-		priority = Base.priority or screen.PRIORITY_DEFAULT,
+		offset 		 = Base.offset,
+		limit  		 = Base.limit,
+		priority  	 = Base.priority or screen.PRIORITY_DEFAULT,
 	}
 	o.Arry=Base.Arry or _const.Arry
 	------------------------------------------------------------------------------

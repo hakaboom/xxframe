@@ -198,20 +198,30 @@ function Base.formatTime(time,pattern)
 	local time = Base.timeTransform(time,pattern,'s')
 	return string.format("%.2d时%.2d分%.2d秒",time/(60*60),time/60%60,time%60)
 end
-function Base.pairsPath(path)
+function Base.pairsPath(path,repl) -- repl如果是个表,则会捕获repl的参数,如果是个函数,则将f(路径),attr作为参数传入表
 	local tbl = {}
 	local path = path or xmod.getPrivatePath()
+	local _type = type(repl)
 	local function _pairs(obj)
 		local new_table = {}
 		for file in lfs.dir(path) do
 			if file~='.' and file~='..' then
 				tbl[file] = new_table
-				local f=string.format('%s/%s',path,file)
+				local f = string.format('%s/%s',path,file)
 				local attr = lfs.attributes(f)
 				if attr.mode == 'directory' then
 					new_table[file] = _pairs(f)
 				else
-					new_table = attr
+					if _type=='function' then
+						repl(f,attr)
+					elseif _type=='table' then
+						table.foreachi(repl,function(k,v)
+							new_table[v] = attr[v]
+						end)
+					else
+						new_table = attr
+					end
+					new_table['path'] = f
 				end
 			end
 		end
@@ -219,6 +229,8 @@ function Base.pairsPath(path)
 	end
 	return _pairs(path)
 end
+
+
 --Print抄自Zqys,在群文件中开源的print代码
 local _SpaceNum = {}
 for i = 1,10 do

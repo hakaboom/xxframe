@@ -279,3 +279,32 @@ function ColorHSVfun:toHSL()
 	local r,g,b = HSVToRGB(self.h,self.s,self.v)
 	return transformColor('ColorHSL',r/0xff,g/0xff,b/0xff)
 end
+
+do
+-- 好像不是很靠谱~~csdn上看到的hsv比色
+-- local R = math.sqrt(2)
+-- local angle = 30
+
+-- local pi = math.pi
+-- local h = R*math.cos(angle/180*pi)
+-- local r = R*math.sin(angle/180*pi)
+
+
+-- h1,s1,v1 = 217,0.4,0.6 
+-- h2,s2,v2 = 217,0.4,1
+
+-- local x1 = r *v1*s1*math.cos(h1/180*pi)
+-- local y1 = r *v1*s1*math.sin(h1/180*pi)
+-- local z1 = h *(1-v1)
+
+-- local x2 = r *v2*s2*math.cos(h2/180*pi)
+-- local y2 = r *v2*s2*math.sin(h2/180*pi)
+-- local z2 = h *(1-v2)
+
+-- dx = x1 - x2
+-- dy = y1 - y2
+-- dz = z1 - z2
+
+-- e = math.sqrt(dx^2+dy^2+dz^2)
+-- print(e)
+end

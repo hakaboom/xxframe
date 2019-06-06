@@ -2,8 +2,7 @@ if not rawget(_G, 'xmod') then
 	error("the 'xmod' not find")
 end
 -- xmod > v2.0.249
--- 交流群qq:952589499
--- v1.3.17
+-- v1.4.0
 --  框架手册			 https://www.zybuluo.com/hakaboom/note/1370480
 --	叉叉2.0开发手册   https://www.zybuluo.com/xxzhushou/note/1271276
 --	lua 5.3手册	  	 https://cloudwu.github.io/lua53doc/contents.html
@@ -23,14 +22,8 @@ CurScreen={	--本机分辨率
 }
 _K=System:new(DevScreen,CurScreen,1,{x='width',y='height'},{x='width',y='height'})
 
-
-for i=1,100000 do
-	multiPoint:new({
-		{x=100,y=100},
-		{x=100,y=100},
-		{x=100,y=100},
-		{x=100,y=100},
-		{x=100,y=100},
-	})
-	sleep(500)
-end
+a=point:new({x=100,y=100,Anchor='Middle'}):printXY()
+multiPoint:new({
+	{x=100,y=100},
+	Anchor='Middle',
+}):printXY()
