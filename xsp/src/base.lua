@@ -26,7 +26,7 @@ function table.copy(tbl)
 		if type(value) == 'table' then
 			new_table[index] = table.copy(value)
 		else
-			new_table[k] = v
+			new_table[index] = value
 		end
 	end
 	return new_table
