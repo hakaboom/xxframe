@@ -141,7 +141,10 @@ local tableCopy 		= function (tbl)
 	end
 	return new_table
 end
-
+local slp				= function (T)
+	T=T and T*1000 or 0.05
+	sleep(T)
+end
 
 _printcmpColorErr_ = function (Cur,Dev,tag,key) 
 	tag=tag or "" 
